@@ -1,0 +1,24 @@
+GET http://localhost:5257/exercises
+
+###
+GET http://localhost:5257/exercises/4
+
+###
+POST http://localhost:5257/exercises
+Content-Type: application/json
+
+{
+    "name": "Pullups"
+}
+
+###
+PUT http://localhost:5257/exercises/4
+Content-Type: application/json
+
+{
+    "id": 4,
+    "name": "Barbell Squat"
+}
+
+###
+DELETE http://localhost:5257/exercises/3
