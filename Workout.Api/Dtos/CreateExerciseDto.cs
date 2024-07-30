@@ -1,5 +1,7 @@
-﻿namespace Workout.Api.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Workout.Api.Dtos;
 
 public record class CreateExerciseDto(
-    string Name
+    [Required][StringLength(50)] string Name
 );

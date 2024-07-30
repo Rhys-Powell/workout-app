@@ -1,6 +1,8 @@
-﻿namespace Workout.Api.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Workout.Api.Dtos;
 
 public record class UpdateExerciseDto(
     int Id,
-    string Name
+    [Required][StringLength(50)] string Name
 );

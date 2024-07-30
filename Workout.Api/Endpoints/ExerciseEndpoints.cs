@@ -25,7 +25,7 @@ public static class ExerciseEndpoints
 
     public static RouteGroupBuilder MapExercisesEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("exercises");
+        var group = app.MapGroup("exercises").WithParameterValidation();
 
         // GET /exercises
         group.MapGet("/", () => exercises);
