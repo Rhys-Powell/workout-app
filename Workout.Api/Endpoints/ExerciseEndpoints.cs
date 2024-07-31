@@ -15,36 +15,37 @@ public static class ExerciseEndpoints
         var group = app.MapGroup("exercises").WithParameterValidation();
 
         // GET /exercises
-        group.MapGet("/", (WorkoutContext dbContext) =>
-            dbContext.Exercises
+        group.MapGet("/", async (WorkoutContext dbContext) =>
+            await dbContext.Exercises
                 .Select(exercise => exercise.ToDto())
                 .AsNoTracking()
+                .ToListAsync()
         );
 
         // GET /exercises/{id}
-        group.MapGet("/{id}", (int id, WorkoutContext dbContext) =>
+        group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>
         {
-            Exercise? exercise = dbContext.Exercises.Find(id);
+            Exercise? exercise = await dbContext.Exercises.FindAsync(id);
 
             return exercise is null ? Results.NotFound() : Results.Ok(exercise.ToDto());
         })
             .WithName(GetExerciseEndpointName);
 
         // POST /exercises
-        group.MapPost("/", (CreateExerciseDto newExercise, WorkoutContext dbContext) =>
+        group.MapPost("/", async (CreateExerciseDto newExercise, WorkoutContext dbContext) =>
         {
             Exercise exercise = newExercise.ToEntity();
 
             dbContext.Exercises.Add(exercise);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             return Results.CreatedAtRoute(GetExerciseEndpointName, new { id = exercise.Id }, exercise.ToDto());
         });
 
         //PUT /exercises/{id}
-        group.MapPut("/{id}", (int id, UpdateExerciseDto updatedExercise, WorkoutContext dbContext) =>
+        group.MapPut("/{id}", async (int id, UpdateExerciseDto updatedExercise, WorkoutContext dbContext) =>
         {
-            var existingExercise = dbContext.Exercises.Find(id);
+            var existingExercise = await dbContext.Exercises.FindAsync(id);
 
             if (existingExercise is null)
             {
@@ -54,17 +55,17 @@ public static class ExerciseEndpoints
             dbContext.Entry(existingExercise)
                 .CurrentValues.SetValues(updatedExercise.ToEntity(id));
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
         });
 
         // DELETE /exercises/{id}
-        group.MapDelete("/{id}", (int id, WorkoutContext dbContext) =>
+        group.MapDelete("/{id}", async (int id, WorkoutContext dbContext) =>
         {
-            dbContext.Exercises
+            await dbContext.Exercises
                 .Where(exercise => exercise.Id == id)
-                .ExecuteDelete();
+                .ExecuteDeleteAsync();
 
             return Results.NoContent();
         });

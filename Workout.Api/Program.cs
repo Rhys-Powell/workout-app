@@ -10,6 +10,6 @@ var app = builder.Build();
 
 app.MapExercisesEndpoints();
 
-app.MigrateDb();
+await app.MigrateDbAsync();
 
 app.Run();
