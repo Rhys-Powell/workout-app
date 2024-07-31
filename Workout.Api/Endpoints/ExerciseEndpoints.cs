@@ -1,4 +1,5 @@
-﻿using Workout.Api.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Workout.Api.Data;
 using Workout.Api.Dtos;
 using Workout.Api.Entities;
 using Workout.Api.Mapping;
@@ -9,27 +10,16 @@ public static class ExerciseEndpoints
 {
     const string GetExerciseEndpointName = "GetExercise";
 
-    private static readonly List<ExerciseDto> exercises = [
-        new (
-            1,
-            "Bench Press"
-        ),
-        new (
-            2,
-            "Squat"
-        ),
-        new (
-            3,
-            "Deadlift"
-        )
-    ];
-
     public static RouteGroupBuilder MapExercisesEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("exercises").WithParameterValidation();
 
         // GET /exercises
-        group.MapGet("/", () => exercises);
+        group.MapGet("/", (WorkoutContext dbContext) =>
+            dbContext.Exercises
+                .Select(exercise => exercise.ToDto())
+                .AsNoTracking()
+        );
 
         // GET /exercises/{id}
         group.MapGet("/{id}", (int id, WorkoutContext dbContext) =>
@@ -52,26 +42,30 @@ public static class ExerciseEndpoints
         });
 
         //PUT /exercises/{id}
-        group.MapPut("/{id}", (int id, UpdateExerciseDto updatedExercise) =>
+        group.MapPut("/{id}", (int id, UpdateExerciseDto updatedExercise, WorkoutContext dbContext) =>
         {
-            var index = exercises.FindIndex(exercise => exercise.Id == id);
+            var existingExercise = dbContext.Exercises.Find(id);
 
-            if (index == -1)
+            if (existingExercise is null)
             {
                 return Results.NotFound();
             }
 
-            exercises[index] = new ExerciseDto(
-                id,
-                updatedExercise.Name
-            );
+            dbContext.Entry(existingExercise)
+                .CurrentValues.SetValues(updatedExercise.ToEntity(id));
+
+            dbContext.SaveChanges();
+
             return Results.NoContent();
         });
 
         // DELETE /exercises/{id}
-        group.MapDelete("/{id}", (int id) =>
+        group.MapDelete("/{id}", (int id, WorkoutContext dbContext) =>
         {
-            exercises.RemoveAll(exercise => exercise.Id == id);
+            dbContext.Exercises
+                .Where(exercise => exercise.Id == id)
+                .ExecuteDelete();
+
             return Results.NoContent();
         });
 

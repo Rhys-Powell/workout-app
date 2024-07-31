@@ -20,4 +20,14 @@ public static class ExerciseMapping
                 exercise.Name
             );
     }
+
+    public static Exercise ToEntity(this UpdateExerciseDto exercise, int id)
+    {
+        return new Exercise()
+        {
+            Id = id,
+            Name = exercise.Name
+        };
+    }
+
 }
