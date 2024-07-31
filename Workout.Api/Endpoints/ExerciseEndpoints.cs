@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
+﻿using Workout.Api.Data;
 using Workout.Api.Dtos;
+using Workout.Api.Entities;
+using Workout.Api.Mapping;
 
 namespace Workout.Api.Endpoints;
 
@@ -31,23 +32,23 @@ public static class ExerciseEndpoints
         group.MapGet("/", () => exercises);
 
         // GET /exercises/{id}
-        group.MapGet("/{id}", (int id) =>
+        group.MapGet("/{id}", (int id, WorkoutContext dbContext) =>
         {
-            ExerciseDto? exercise = exercises.Find(exercise => exercise.Id == id);
+            Exercise? exercise = dbContext.Exercises.Find(id);
 
-            return exercise is null ? Results.NotFound() : Results.Ok(exercise);
+            return exercise is null ? Results.NotFound() : Results.Ok(exercise.ToDto());
         })
             .WithName(GetExerciseEndpointName);
 
         // POST /exercises
-        group.MapPost("/", (CreateExerciseDto newExercise) =>
+        group.MapPost("/", (CreateExerciseDto newExercise, WorkoutContext dbContext) =>
         {
-            ExerciseDto exercise = new(
-                exercises.Count + 1,
-                newExercise.Name
-            );
-            exercises.Add(exercise);
-            return Results.CreatedAtRoute(GetExerciseEndpointName, new { id = exercise.Id }, exercise);
+            Exercise exercise = newExercise.ToEntity();
+
+            dbContext.Exercises.Add(exercise);
+            dbContext.SaveChanges();
+
+            return Results.CreatedAtRoute(GetExerciseEndpointName, new { id = exercise.Id }, exercise.ToDto());
         });
 
         //PUT /exercises/{id}

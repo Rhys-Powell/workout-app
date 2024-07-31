@@ -1,6 +1,6 @@
 ﻿namespace Workout.Api.Dtos;
 
-public record class WorkoutDto(
+public record class ExerciseDto(
     int Id,
     string Name
 );
