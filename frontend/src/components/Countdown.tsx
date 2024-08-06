@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import './Countdown.css';
+import SetTimer from './SetTimer';
 
 const defaultCountdownSecs = 120;
 
 export default function Countdown() {
   const [count, setCount] = useState(defaultCountdownSecs);
   const [timerStarted, setTimerStarted] = useState(false);
+  const [showTimerInput, setShowTimerInput] = useState(false);
 
   const formattedCount = (() => {
     const minutes = Math.floor(count / 60);
@@ -52,13 +55,30 @@ export default function Countdown() {
     setTimerStarted(!timerStarted);
   }
 
+  function setTimerDuration() {
+    setTimerStarted(false);
+    setShowTimerInput(!showTimerInput);
+  }
+
+  function handleCountChange(minutes: number, seconds: number) {
+    setCount(minutes * 60 + seconds);
+    setShowTimerInput(false);
+  }
+
   return (
     <>
-      <button onClick={startStopTimer}>
-        {timerStarted ? <FontAwesomeIcon icon={faStop} /> : <FontAwesomeIcon icon={faPlay} />}
-      </button>
-      <div>{formattedCount}</div>
-      <button onClick={resetCountdown}>Reset</button>
+      {showTimerInput ? (
+        <SetTimer count={count} onValueChange={handleCountChange} />
+      ) : (
+        <>
+          <button onClick={startStopTimer}>
+            {timerStarted ? <FontAwesomeIcon icon={faStop} /> : <FontAwesomeIcon icon={faPlay} />}
+          </button>
+          <button onClick={setTimerDuration}>Set duration</button>
+          <div>{formattedCount}</div>
+          <button onClick={resetCountdown}>Reset</button>
+        </>
+      )}
     </>
   );
 }
