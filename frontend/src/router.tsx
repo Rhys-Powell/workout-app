@@ -1,20 +1,19 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import Home from '../src/pages/Home';
-import Timer from '../src/components/Timer';
-
+import { Exercise } from '../src/components/Exercise';
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
       {
-        path: '/',
+        path: '',
         element: <Home />,
       },
       {
-        path: '/timer',
-        element: <Timer />,
+        path: '/exercises',
+        element: <Exercise />,
       },
     ],
   },

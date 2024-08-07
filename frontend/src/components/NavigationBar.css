@@ -1,0 +1,10 @@
+.navigation-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.navbar-item {
+  display: inline-block;
+  padding: 0 1em;
+}
