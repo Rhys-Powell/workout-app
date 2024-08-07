@@ -1,11 +1,12 @@
+import { Outlet } from 'react-router-dom';
 import './App.css';
-
-import Timer from './components/Timer';
 
 function App() {
   return (
     <>
-      <Timer />
+      <main>
+        <Outlet />
+      </main>
     </>
   );
 }
