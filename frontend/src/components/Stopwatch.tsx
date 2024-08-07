@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import './Stopwatch.css';
 
 const maxSecs = 5999;
 
@@ -53,12 +54,12 @@ export default function Stopwatch() {
   }
 
   return (
-    <>
+    <div className="stopwatch">
+      <button onClick={resetStopwatch}>Reset</button>
+      <p>{formattedCount}</p>
       <button onClick={startStopTimer}>
         {timerStarted ? <FontAwesomeIcon icon={faStop} /> : <FontAwesomeIcon icon={faPlay} />}
       </button>
-      <div>{formattedCount}</div>
-      <button onClick={resetStopwatch}>Reset</button>
-    </>
+    </div>
   );
 }

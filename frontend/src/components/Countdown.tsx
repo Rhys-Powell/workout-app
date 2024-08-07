@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faMinus, faPlay, faPlus, faStop } from '@fortawesome/free-solid-svg-icons';
 import './Countdown.css';
 import SetTimer from './SetTimer';
 
-const defaultCountdownSecs = 120;
+const defaultStartingCount = 120;
 
 export default function Countdown() {
-  const [count, setCount] = useState(defaultCountdownSecs);
+  const [count, setCount] = useState(defaultStartingCount);
   const [timerStarted, setTimerStarted] = useState(false);
   const [showTimerInput, setShowTimerInput] = useState(false);
+  const [startingCount, setStartingCount] = useState(defaultStartingCount);
 
   const formattedCount = (() => {
     const minutes = Math.floor(count / 60);
@@ -20,9 +21,9 @@ export default function Countdown() {
   const resetCountdownRef = useRef<() => void>(() => {});
 
   const resetCountdown = useCallback(() => {
-    setCount(defaultCountdownSecs);
+    setCount(startingCount);
     setTimerStarted(false);
-  }, []);
+  }, [startingCount]);
 
   resetCountdownRef.current = resetCountdown;
 
@@ -55,14 +56,24 @@ export default function Countdown() {
     setTimerStarted(!timerStarted);
   }
 
-  function setTimerDuration() {
+  function changeTimerDuration() {
     setTimerStarted(false);
     setShowTimerInput(!showTimerInput);
   }
 
   function handleCountChange(minutes: number, seconds: number) {
-    setCount(minutes * 60 + seconds);
+    const newStartingCount = minutes * 60 + seconds;
+    setCount(newStartingCount);
+    setStartingCount(newStartingCount);
     setShowTimerInput(false);
+  }
+
+  function incrementCount() {
+    setCount((prevCount) => prevCount + 1);
+  }
+
+  function decrementCount() {
+    setCount((prevCount) => prevCount - 1);
   }
 
   return (
@@ -70,14 +81,20 @@ export default function Countdown() {
       {showTimerInput ? (
         <SetTimer count={count} onValueChange={handleCountChange} />
       ) : (
-        <>
+        <div className="countdown">
+          <button onClick={resetCountdown}>Reset</button>
+          <button onClick={changeTimerDuration}>Set duration</button>
+          <button onClick={incrementCount}>
+            <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          </button>
+          <p>{formattedCount}</p>
+          <button onClick={decrementCount}>
+            <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
+          </button>
           <button onClick={startStopTimer}>
             {timerStarted ? <FontAwesomeIcon icon={faStop} /> : <FontAwesomeIcon icon={faPlay} />}
           </button>
-          <button onClick={setTimerDuration}>Set duration</button>
-          <div>{formattedCount}</div>
-          <button onClick={resetCountdown}>Reset</button>
-        </>
+        </div>
       )}
     </>
   );
