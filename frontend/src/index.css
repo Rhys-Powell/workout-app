@@ -15,7 +15,7 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: white;
   text-decoration: inherit;
 }
 a:hover {
@@ -24,7 +24,7 @@ a:hover {
 
 header {
   height: 3em;
-  background-color: white;
+  background-color: gray;
   align-content: center;
 }
 
