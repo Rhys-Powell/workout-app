@@ -22,7 +22,10 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowReactApp");
-app.MapExercisesEndpoints();
+app.MapExerciseEndpoints();
+app.MapUserEndpoints();
+app.MapRoutineEndpoints();
+app.MapRoutineExercisesEndpoints();
 
 await app.MigrateDbAsync();
 

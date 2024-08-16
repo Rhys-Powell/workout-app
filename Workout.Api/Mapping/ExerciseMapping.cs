@@ -5,28 +5,23 @@ namespace Workout.Api.Mapping;
 
 public static class ExerciseMapping
 {
-    public static Exercise ToEntity(this CreateExerciseDto exercise)
+    public static ExerciseDto ToDto(this Exercise exercise)
     {
-        return new Exercise()
+        return new ExerciseDto
         {
-            Name = exercise.Name
+            Id = exercise.Id,
+            Name = exercise.Name,
+            UserId = exercise.UserId
         };
     }
 
-    public static ExerciseDto ToDto(this Exercise exercise)
+    public static Exercise ToEntity(this ExerciseDto exercise)
     {
-        return new(
-                exercise.Id,
-                exercise.Name
-            );
-    }
-
-    public static Exercise ToEntity(this UpdateExerciseDto exercise, int id)
-    {
-        return new Exercise()
+        return new Exercise
         {
-            Id = id,
-            Name = exercise.Name
+            Id = exercise.Id,
+            Name = exercise.Name,
+            UserId = exercise.UserId,
         };
     }
 

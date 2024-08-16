@@ -1,6 +1,6 @@
 ﻿namespace Workout.Api.Dtos;
 
-public class ExerciseDto
+public class RoutineDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }

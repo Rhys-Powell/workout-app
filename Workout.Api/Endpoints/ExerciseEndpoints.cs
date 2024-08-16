@@ -10,61 +10,71 @@ public static class ExerciseEndpoints
 {
     const string GetExerciseEndpointName = "GetExercise";
 
-    public static RouteGroupBuilder MapExercisesEndpoints(this WebApplication app)
+    public static RouteGroupBuilder MapExerciseEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("exercises").WithParameterValidation();
+        var group = app.MapGroup("users/{userId}/exercises").WithParameterValidation();
 
-        // GET /exercises
-        group.MapGet("/", async (WorkoutContext dbContext) =>
-            await dbContext.Exercises
+        // GET users/{userId}/exercises
+        group.MapGet("/", async (int userId, WorkoutContext dbContext) =>
+        {
+            var exercises = await dbContext.Exercises
+                .Where(ex => ex.UserId == userId)
                 .Select(exercise => exercise.ToDto())
                 .AsNoTracking()
-                .ToListAsync()
-        );
+                .ToListAsync();
 
-        // GET /exercises/{id}
-        group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>
+            if (exercises == null || !exercises.Any())
+            {
+                return Results.NotFound("No exercises found for this user.");
+            }
+            return Results.Ok(exercises);
+        });
+
+        // GET users/{userId}/exercises/{exerciseId}
+        group.MapGet("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
         {
-            Exercise? exercise = await dbContext.Exercises.FindAsync(id);
+            var exercise = await dbContext.Exercises
+                .Where(e => e.Id == exerciseId && e.UserId == userId)
+                .FirstOrDefaultAsync();
 
             return exercise is null ? Results.NotFound() : Results.Ok(exercise.ToDto());
         })
             .WithName(GetExerciseEndpointName);
 
-        // POST /exercises
-        group.MapPost("/", async (CreateExerciseDto newExercise, WorkoutContext dbContext) =>
+        // POST users/{userId}/exercises
+        group.MapPost("/", async (int userId, ExerciseDto newExercise, WorkoutContext dbContext) =>
         {
             Exercise exercise = newExercise.ToEntity();
 
             dbContext.Exercises.Add(exercise);
             await dbContext.SaveChangesAsync();
 
-            return Results.CreatedAtRoute(GetExerciseEndpointName, new { id = exercise.Id }, exercise.ToDto());
+            return Results.CreatedAtRoute(GetExerciseEndpointName, new { userId, exerciseId = exercise.Id }, exercise.ToDto());
         });
 
-        //PUT /exercises/{id}
-        group.MapPut("/{id}", async (int id, UpdateExerciseDto updatedExercise, WorkoutContext dbContext) =>
+        //PUT users/{userId}/exercises/{exerciseId}
+        group.MapPut("/{exerciseId}", async (int userId, int exerciseId, ExerciseDto updatedExercise, WorkoutContext dbContext) =>
         {
-            var existingExercise = await dbContext.Exercises.FindAsync(id);
+            var existingExercise = await dbContext.Exercises
+                 .FirstOrDefaultAsync(e => e.Id == exerciseId && e.UserId == userId);
 
             if (existingExercise is null)
             {
                 return Results.NotFound();
             }
 
-            dbContext.Entry(existingExercise)
-                .CurrentValues.SetValues(updatedExercise.ToEntity(id));
+            existingExercise.Name = updatedExercise.Name;
 
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
         });
 
-        // DELETE /exercises/{id}
-        group.MapDelete("/{id}", async (int id, WorkoutContext dbContext) =>
+        // DELETE users/{userId}/exercises/{exerciseId}
+        group.MapDelete("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
         {
             await dbContext.Exercises
-                .Where(exercise => exercise.Id == id)
+                .Where(e => e.Id == exerciseId && e.UserId == userId)
                 .ExecuteDeleteAsync();
 
             return Results.NoContent();

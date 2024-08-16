@@ -1,0 +1,42 @@
+GET http://localhost:5257/users/1/routines
+
+###
+GET http://localhost:5257/users/4/routines/6
+
+
+###
+POST http://localhost:5257/users/1/routines
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "name": "Leg day"
+}
+
+###
+PUT http://localhost:5257/users/1/routines/1
+Content-Type: application/json
+
+{
+    "name": "Leg day",
+    "exercises": [
+        {
+        "exerciseid": 1 
+        }
+    ]
+}
+
+
+###
+
+PUT http://localhost:5257/users/4/routines/3
+Content-Type: application/json
+
+{
+    "name": "Lower day",
+    "userId": 4
+}
+
+
+###
+DELETE http://localhost:5257/users/4/routines/10

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Workout.Api.Entities;
 
-public class Exercise
+public class Routine
 {
     public int Id { get; set; }
     [Column(TypeName = "TEXT NOT NULL")]
