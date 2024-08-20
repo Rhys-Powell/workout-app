@@ -21,16 +21,19 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthContextType['user'] | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser !== 'undefined' && storedUser !== null) {
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
+      setToken(storedToken);
     }
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -73,6 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <AuthContext.Provider value={{ user, token, login, logout, isLoading, error }}>{children}</AuthContext.Provider>
   );
