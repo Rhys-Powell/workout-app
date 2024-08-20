@@ -3,6 +3,8 @@ import App from './App';
 import Home from '../src/pages/Home';
 import { Exercise } from '../src/components/Exercise';
 import Login from '../src/pages/Login';
+import PrivateRoute from './context/RouteGuard';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -18,7 +20,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/exercises',
-        element: <Exercise />,
+        element: (
+          <PrivateRoute>
+            <Exercise />
+          </PrivateRoute>
+        ),
       },
     ],
   },

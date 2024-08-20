@@ -26,6 +26,7 @@ app.MapExerciseEndpoints();
 app.MapUserEndpoints();
 app.MapRoutineEndpoints();
 app.MapRoutineExercisesEndpoints();
+app.MapAuthenticationEndpoints();
 
 await app.MigrateDbAsync();
 
