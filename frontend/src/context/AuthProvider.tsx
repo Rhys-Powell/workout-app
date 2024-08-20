@@ -11,7 +11,7 @@ export interface AuthContextType {
   } | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
   isLoading: boolean;
   error: string | null;
 }
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
-        navigate('/exercises');
+        navigate('/');
       } else {
         setError('Invalid email or password');
       }
@@ -58,13 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
     setIsLoading(true);
     try {
-      await fetch('/api/logout', { method: 'POST' });
       setUser(null);
+      setToken(null);
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      navigate('/login');
     } catch (error) {
       setError('Error logging out');
     } finally {
