@@ -21,6 +21,9 @@ export default function NavigationBar() {
       <div className="navbar-item">
         <Link to="/exercises">Exercises</Link>
       </div>
+      <div className="navbar-item">
+        <Link to="/routines">Routines</Link>
+      </div>
       {isLoggedIn && (
         <div className="navbar-item">
           <button onClick={handleClick}>Log out</button>

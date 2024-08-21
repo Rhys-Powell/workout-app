@@ -4,6 +4,7 @@ import Home from '../src/pages/Home';
 import { Exercise } from '../src/components/Exercise';
 import Login from '../src/pages/Login';
 import PrivateRoute from './context/RouteGuard';
+import Routines from './pages/Routines';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Exercise />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/routines',
+        element: (
+          <PrivateRoute>
+            <Routines />
           </PrivateRoute>
         ),
       },

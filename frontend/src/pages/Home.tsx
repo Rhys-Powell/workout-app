@@ -1,21 +1,11 @@
-import * as DataService from '../DataService';
-import { Exercise } from '../types/Exercise';
-import { useState } from 'react';
+import { useAuth } from '../context/AuthHooks';
 
 export default function Home() {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-
-  async function handleClick() {
-    setExercises(await DataService.fetchData());
-  }
+  const context = useAuth();
 
   return (
     <div>
-      <h1>Home</h1>
-      <button onClick={handleClick}>Get exercises</button>
-      {exercises.map((exercise) => (
-        <ul key={exercise.id}>{exercise.name}</ul>
-      ))}
+      <h2>Welcome {context?.user?.name}</h2>
     </div>
   );
 }

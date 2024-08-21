@@ -1,14 +1,22 @@
 const API_BASE_URL = await import.meta.env.VITE_PROXY;
 
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`${response.status} ${response.statusText}: ${error.message}`);
-  }
-  return await response.json();
-};
+export const fetchData = async (endpoint: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-export const fetchData = async () => {
-  const response = await fetch(`${API_BASE_URL}/exercises`);
-  return handleResponse(response);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
