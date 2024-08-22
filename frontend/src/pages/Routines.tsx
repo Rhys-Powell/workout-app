@@ -1,28 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthHooks';
 import { getData, postData } from '../DataService';
 import { Routine } from '../types/Routine';
+import { Link, useParams } from 'react-router-dom';
 
 export default function Routines() {
   const [routines, setRoutines] = useState<Routine[]>([]);
-  const auth = useAuth();
   const [input, setInput] = useState({ name: '' });
-  const userId = auth?.user?.id;
+  const urlParams = useParams();
   const [createMode, setCreateMode] = useState(false);
 
   const getRoutines = useCallback(async () => {
     try {
-      const data: Routine[] = await getData('users/' + userId + '/routines');
+      const data: Routine[] = await getData('users/' + urlParams.userId + '/routines');
       return data;
     } catch (error) {
       console.error(error);
     }
-  }, [userId]);
+  }, [urlParams]);
 
   async function createRoutine() {
-    if (userId != null) {
+    if (urlParams.userId != null) {
       try {
-        await postData('users/' + userId + '/routines', { userId: userId, name: input.name });
+        await postData('users/' + urlParams.userId + '/routines', { userId: urlParams.userId, name: input.name });
       } catch (error) {
         console.error(error);
       }
@@ -33,10 +32,8 @@ export default function Routines() {
   }
 
   useEffect(() => {
-    if (auth && userId) {
-      getRoutines().then((value) => setRoutines(value ?? []));
-    }
-  }, [auth, userId, getRoutines]);
+    getRoutines().then((value) => setRoutines(value ?? []));
+  }, [getRoutines]);
 
   function handleClick() {
     setCreateMode(true);
@@ -56,11 +53,12 @@ export default function Routines() {
 
   return (
     <>
-      <ul>
-        {routines.map((routine) => (
-          <li key={routine.id}>{routine.name}</li>
-        ))}
-      </ul>
+      {routines.map((routine) => (
+        <div key={routine.id}>
+          <Link to={`${routine.id}`}>{routine.name}</Link>
+        </div>
+      ))}
+
       {createMode ? null : <button onClick={handleClick}>Add Routine</button>}
 
       {createMode ? (

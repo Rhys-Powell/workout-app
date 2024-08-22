@@ -5,6 +5,7 @@ import { Exercise } from '../src/components/Exercise';
 import Login from '../src/pages/Login';
 import PrivateRoute from './context/RouteGuard';
 import Routines from './pages/Routines';
+import Routine from './pages/Routine';
 
 const router = createBrowserRouter([
   {
@@ -32,10 +33,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/routines',
+        path: 'users/:userId/routines',
         element: (
           <PrivateRoute>
             <Routines />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'users/:userId/routines/:routineId',
+        element: (
+          <PrivateRoute>
+            <Routine />
           </PrivateRoute>
         ),
       },

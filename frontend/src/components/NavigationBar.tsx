@@ -3,9 +3,10 @@ import './NavigationBar.css';
 import { useAuth } from '../context/AuthHooks';
 
 export default function NavigationBar() {
-  const context = useAuth();
-  const logout = context?.logout;
-  const isLoggedIn = !!context?.token;
+  const authContext = useAuth();
+  const userId = authContext?.user?.id;
+  const logout = authContext?.logout;
+  const isLoggedIn = !!authContext?.token;
 
   async function handleClick() {
     if (logout) {
@@ -22,7 +23,7 @@ export default function NavigationBar() {
         <Link to="/exercises">Exercises</Link>
       </div>
       <div className="navbar-item">
-        <Link to="/routines">Routines</Link>
+        <Link to={`/users/${userId}/routines`}>Routines</Link>
       </div>
       {isLoggedIn && (
         <div className="navbar-item">

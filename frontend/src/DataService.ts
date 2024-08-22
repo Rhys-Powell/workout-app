@@ -1,8 +1,10 @@
 const API_BASE_URL = await import.meta.env.VITE_PROXY;
 
-export const getData = async (endpoint: string) => {
+export const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    const url = new URL(`${API_BASE_URL}/${endpoint}`);
+    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
