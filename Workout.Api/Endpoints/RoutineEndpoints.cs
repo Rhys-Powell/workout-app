@@ -62,26 +62,6 @@ public static class RoutineEndpoints
                 return Results.NotFound();
             }
 
-            // //Update exercises
-            // existingRoutine.RoutineExercises?.Clear();
-
-            // foreach (var exercise in updatedWorkout.Exercises)
-            // {
-            //     var existingExercise = await dbContext.Exercises
-            //         .Where(e => e.UserId == userId && e.Id == exercise.ExerciseId)
-            //         .FirstOrDefaultAsync();
-            //     if (existingExercise is not null)
-            //     {
-            //         var workoutExercise = new WorkoutExercise
-            //         {
-            //             routineId = existingRoutine.Id,
-            //             Exercise = existingExercise,
-            //             Workout = existingRoutine
-            //         };
-            //         existingRoutine.WorkoutExercises?.Add(workoutExercise);
-            //     }
-            // }
-
             //Update name field
             existingRoutine.Name = updatedWorkout.Name;
 

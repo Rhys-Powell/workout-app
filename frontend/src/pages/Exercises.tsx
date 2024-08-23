@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getData, postData } from '../DataService';
+import { getData, postData, deleteData } from '../DataService';
 import { Link, useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 
@@ -31,11 +31,24 @@ export default function Exercises() {
     }
   }
 
+  async function deleteExercise(exerciseId: number) {
+    if (urlParams.userId != null) {
+      try {
+        await deleteData('users/' + urlParams.userId + '/exercises/' + exerciseId);
+        setExercises((prevExercises) => prevExercises.filter((e) => e.id !== exerciseId));
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      console.error('User ID is null');
+    }
+  }
+
   useEffect(() => {
     getExercises().then((value) => setExercises(value ?? []));
   }, [getExercises]);
 
-  function handleClick() {
+  function changeMode() {
     setCreateMode(true);
   }
 
@@ -56,9 +69,10 @@ export default function Exercises() {
       {exercises.map((exercise) => (
         <div key={exercise.id}>
           <Link to={`${exercise.id}`}>{exercise.name}</Link>
+          <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
         </div>
       ))}
-      {createMode ? null : <button onClick={handleClick}>Add Exercise</button>}
+      {createMode ? null : <button onClick={changeMode}>Add Exercise</button>}
       {createMode ? (
         <form onSubmit={handleSubmit}>
           <label>

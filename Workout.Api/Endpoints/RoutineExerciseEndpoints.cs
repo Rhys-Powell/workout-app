@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Workout.Api.Data;
 using Workout.Api.Dtos;
@@ -8,13 +9,12 @@ namespace Workout.Api.Endpoints;
 
 public static class RoutineExerciseEndpoints
 {
-    const string GetRoutineExerciseEndpointName = "GetExerciseRoutine";
+    const string GetRoutineExerciseEndpointName = "GetRoutineExercise";
     private const int InvalidExerciseId = -1;
 
     public static RouteGroupBuilder MapRoutineExercisesEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("users/{userId}/routines/{routineId}/exercises").WithParameterValidation();
-
 
         // GET users/{userId}/routines/{routineId}/exercises?includeDetails=true
         group.MapGet("/", async (int userId, int routineId, bool includeDetails, WorkoutContext dbContext) =>
@@ -37,19 +37,19 @@ public static class RoutineExerciseEndpoints
         .WithName(GetRoutineExerciseEndpointName);
 
         // POST users/{userId}/routines/{routineId}/exercises
-        group.MapPost("/", async (int userId, int routineId, RoutineExercise routineExercise, WorkoutContext dbContext) =>
+        group.MapPost("/", async (int userId, [FromQuery] int exerciseId, int routineId, WorkoutContext dbContext) =>
         {
             //Validate routineId
             var routine = await dbContext.Routines.FindAsync(routineId);
             if (routine == null || routine.UserId != userId) return Results.NotFound("Routine not found");
 
             //Validate exerciseId
-            var exercise = await dbContext.Exercises.FindAsync(routineExercise.ExerciseId);
+            var exercise = await dbContext.Exercises.FindAsync(exerciseId);
             if (exercise == null) return Results.NotFound("Exercise not found");
 
             //Check if exercise already exists in routine
             var existingExercise = await dbContext.RoutineExercise
-                .Where(re => re.RoutineId == routineId && re.ExerciseId == routineExercise.ExerciseId)
+                .Where(re => re.RoutineId == routineId && re.ExerciseId == exerciseId)
                 .FirstOrDefaultAsync();
 
             if (existingExercise != null) return Results.BadRequest("Exercise already exists in routine");
@@ -59,17 +59,28 @@ public static class RoutineExerciseEndpoints
                 .Where(re => re.RoutineId == routineId)
                 .MaxAsync(re => (int?)re.ExerciseOrder) ?? 0;
 
-            dbContext.RoutineExercise.Add(new RoutineExercise
+            var newRoutineExercise = dbContext.RoutineExercise.Add(new RoutineExercise
             {
                 RoutineId = routineId,
-                Exercise = exercise,
+                ExerciseId = exerciseId,
                 ExerciseOrder = maxExerciseOrder + 1
             });
 
             await dbContext.SaveChangesAsync();
 
-            return Results.Created($"/users/{userId}/routines/{routineId}/exercises/{routineExercise.ExerciseId}", routineExercise);
+            return Results.CreatedAtRoute(GetRoutineExerciseEndpointName, new { routineId, exerciseId }, newRoutineExercise.Entity.ToDto());
         });
+
+        // DELETE users/{userId}/routines/{routineId}/exercises/{exerciseId}
+        group.MapDelete("/{exerciseId}", async (int routineId, int exerciseId, WorkoutContext dbContext) =>
+        {
+            await dbContext.RoutineExercise
+                .Where(re => re.RoutineId == routineId && re.ExerciseId == exerciseId)
+                .ExecuteDeleteAsync();
+
+            return Results.NoContent();
+        }
+        );
 
         return group;
     }
