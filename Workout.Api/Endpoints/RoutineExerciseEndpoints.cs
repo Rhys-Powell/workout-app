@@ -24,11 +24,6 @@ public static class RoutineExerciseEndpoints
                 .AsNoTracking()
                 .ToListAsync();
 
-            if (routineExercises == null || !routineExercises.Any())
-            {
-                return Results.NotFound("No exercises found for this routine");
-            }
-
             if (includeDetails)
             {
                 routineExercises = await dbContext.RoutineExercise
@@ -44,22 +39,25 @@ public static class RoutineExerciseEndpoints
         // POST users/{userId}/routines/{routineId}/exercises
         group.MapPost("/", async (int userId, int routineId, RoutineExercise routineExercise, WorkoutContext dbContext) =>
         {
+            //Validate routineId
             var routine = await dbContext.Routines.FindAsync(routineId);
-            if (routine == null || routine.UserId != userId) return Results.NotFound();
+            if (routine == null || routine.UserId != userId) return Results.NotFound("Routine not found");
 
+            //Validate exerciseId
+            var exercise = await dbContext.Exercises.FindAsync(routineExercise.ExerciseId);
+            if (exercise == null) return Results.NotFound("Exercise not found");
+
+            //Check if exercise already exists in routine
             var existingExercise = await dbContext.RoutineExercise
                 .Where(re => re.RoutineId == routineId && re.ExerciseId == routineExercise.ExerciseId)
                 .FirstOrDefaultAsync();
 
             if (existingExercise != null) return Results.BadRequest("Exercise already exists in routine");
 
+            //Find the highest existing exercise order
             var maxExerciseOrder = await dbContext.RoutineExercise
                 .Where(re => re.RoutineId == routineId)
                 .MaxAsync(re => (int?)re.ExerciseOrder) ?? 0;
-
-            var exercise = await dbContext.Exercises.FindAsync(routineExercise.ExerciseId);
-
-            if (exercise == null) return Results.NotFound("Exercise not found");
 
             dbContext.RoutineExercise.Add(new RoutineExercise
             {

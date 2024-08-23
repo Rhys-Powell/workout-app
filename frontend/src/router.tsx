@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
-import Home from '../src/pages/Home';
-import { Exercise } from '../src/components/Exercise';
-import Login from '../src/pages/Login';
+import Home from './pages/Home';
+import Exercises from './pages/Exercises';
+import Login from './pages/Login';
 import PrivateRoute from './context/RouteGuard';
 import Routines from './pages/Routines';
 import Routine from './pages/Routine';
@@ -25,10 +25,10 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: '/exercises',
+        path: '/users/:userId/exercises',
         element: (
           <PrivateRoute>
-            <Exercise />
+            <Exercises />
           </PrivateRoute>
         ),
       },

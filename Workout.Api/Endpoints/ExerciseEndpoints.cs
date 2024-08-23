@@ -23,10 +23,6 @@ public static class ExerciseEndpoints
                 .AsNoTracking()
                 .ToListAsync();
 
-            if (exercises == null || !exercises.Any())
-            {
-                return Results.NotFound("No exercises found for this user.");
-            }
             return Results.Ok(exercises);
         });
 

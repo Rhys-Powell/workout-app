@@ -1,27 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getData, postData } from '../DataService';
-import { Routine } from '../types/Routine';
 import { Link, useParams } from 'react-router-dom';
+import { Exercise } from '../types/Exercise';
 
-export default function Routines() {
-  const [routines, setRoutines] = useState<Routine[]>([]);
+export default function Exercises() {
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const urlParams = useParams();
 
-  const getRoutines = useCallback(async () => {
+  const getExercises = useCallback(async () => {
     try {
-      const data: Routine[] = await getData('users/' + urlParams.userId + '/routines');
+      const data: Exercise[] = await getData('users/' + urlParams.userId + '/exercises');
       return data;
     } catch (error) {
       console.error(error);
     }
   }, [urlParams]);
 
-  async function createRoutine() {
+  async function createExercise() {
     if (urlParams.userId != null) {
       try {
-        await postData('users/' + urlParams.userId + '/routines', { userId: urlParams.userId, name: input.name });
+        await postData('users/' + urlParams.userId + '/exercises', { userId: urlParams.userId, name: input.name });
       } catch (error) {
         console.error(error);
       }
@@ -32,8 +32,8 @@ export default function Routines() {
   }
 
   useEffect(() => {
-    getRoutines().then((value) => setRoutines(value ?? []));
-  }, [getRoutines]);
+    getExercises().then((value) => setExercises(value ?? []));
+  }, [getExercises]);
 
   function handleClick() {
     setCreateMode(true);
@@ -46,23 +46,23 @@ export default function Routines() {
 
   function handleSubmit() {
     if (input.name !== '') {
-      createRoutine();
+      createExercise();
     }
   }
 
   return (
     <>
-      {routines.length === 0 ? <p>No routines found</p> : null}
-      {routines.map((routine) => (
-        <div key={routine.id}>
-          <Link to={`${routine.id}`}>{routine.name}</Link>
+      {exercises.length === 0 ? <p>No exercises found</p> : null}
+      {exercises.map((exercise) => (
+        <div key={exercise.id}>
+          <Link to={`${exercise.id}`}>{exercise.name}</Link>
         </div>
       ))}
-      {createMode ? null : <button onClick={handleClick}>Add Routine</button>}
+      {createMode ? null : <button onClick={handleClick}>Add Exercise</button>}
       {createMode ? (
         <form onSubmit={handleSubmit}>
           <label>
-            Routine Name:
+            Exercise Name:
             <input type="string" name="name" onChange={handleInput} />
           </label>
           <button type="submit">Submit</button>

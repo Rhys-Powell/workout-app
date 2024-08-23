@@ -10,7 +10,7 @@ export default function Routine() {
   const getRoutineExercises = useCallback(async () => {
     try {
       const data: RoutineExercise[] = await getData(
-        'users/' + urlParams.userId + '/routines/' + urlParams.routineId + '/Exercises',
+        'users/' + urlParams.userId + '/routines/' + urlParams.routineId + '/exercises',
         {
           includeDetails: 'true',
         },
@@ -27,6 +27,7 @@ export default function Routine() {
 
   return (
     <>
+      {exercises.length === 0 ? <p>No exercises found</p> : null}
       {[...exercises]
         .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
         .map((exercise) => (
