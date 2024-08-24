@@ -2,19 +2,30 @@ import { useCallback, useEffect, useState } from 'react';
 import { getData, postData } from '../DataService';
 import { Routine } from '../types/Routine';
 import { Link, useParams } from 'react-router-dom';
+import errors from '../../metadata/errors.json';
+import Errors from '../types/errors';
+
+const typedErrors: Errors = errors;
 
 export default function Routines() {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
+  const [error, setError] = useState(false);
   const urlParams = useParams();
 
   const getRoutines = useCallback(async () => {
     try {
       const data: Routine[] = await getData('users/' + urlParams.userId + '/routines');
+      setError(false);
       return data;
     } catch (error) {
-      console.error(error);
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.error('Failed to fetch data:', error);
+        setError(true);
+      } else {
+        console.error(error);
+      }
     }
   }, [urlParams]);
 
@@ -22,8 +33,14 @@ export default function Routines() {
     if (urlParams.userId != null) {
       try {
         await postData('users/' + urlParams.userId + '/routines', { userId: urlParams.userId, name: input.name });
+        setError(false);
       } catch (error) {
-        console.error(error);
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('Failed to fetch data:', error);
+          setError(true);
+        } else {
+          console.error(error);
+        }
       }
     } else {
       console.error('User ID is null');
@@ -52,14 +69,15 @@ export default function Routines() {
 
   return (
     <>
-      {routines.length === 0 ? <p>No routines found</p> : null}
+      {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
+      {routines.length === 0 && <p>No routines found</p>}
       {routines.map((routine) => (
         <div key={routine.id}>
           <Link to={`${routine.id}`}>{routine.name}</Link>
         </div>
       ))}
-      {createMode ? null : <button onClick={handleClick}>Add Routine</button>}
-      {createMode ? (
+      {!createMode && <button onClick={handleClick}>Add Routine</button>}
+      {createMode && (
         <form onSubmit={handleSubmit}>
           <label>
             Routine Name:
@@ -70,7 +88,7 @@ export default function Routines() {
             Cancel
           </button>
         </form>
-      ) : null}
+      )}
     </>
   );
 }

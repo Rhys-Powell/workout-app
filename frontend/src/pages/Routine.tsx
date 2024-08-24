@@ -3,6 +3,10 @@ import { RoutineExercise } from '../types/RoutineExercises';
 import { deleteData, getData, postDataWithQueryString } from '../DataService';
 import { useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
+import errors from '../../metadata/errors.json';
+import Errors from '../types/errors';
+
+const typedErrors: Errors = errors;
 
 export default function Routine() {
   const [exercises, setExercises] = useState<RoutineExercise[]>([]);
@@ -10,6 +14,7 @@ export default function Routine() {
   const urlParams = useParams();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [options, setOptions] = useState<Exercise[]>([]);
+  const [error, setError] = useState(false);
 
   const getRoutineExercises = useCallback(async () => {
     try {
@@ -21,16 +26,27 @@ export default function Routine() {
       );
       return data;
     } catch (error) {
-      console.error(error);
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.error('Failed to fetch data:', error);
+        setError(true);
+      } else {
+        console.error(error);
+      }
     }
   }, [urlParams]);
 
   const getExercises = useCallback(async () => {
     try {
       const data: Exercise[] = await getData('users/' + urlParams.userId + '/exercises');
+      setError(false);
       return data;
     } catch (error) {
-      console.error(error);
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.error('Failed to fetch data:', error);
+        setError(true);
+      } else {
+        console.error(error);
+      }
     }
   }, [urlParams]);
 
@@ -40,8 +56,14 @@ export default function Routine() {
         await postDataWithQueryString('users/' + urlParams.userId + '/routines/' + urlParams.routineId + '/exercises', {
           exerciseId: selectedOption.toString(),
         });
+        setError(false);
       } catch (error) {
-        console.error(error);
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('Failed to fetch data:', error);
+          setError(true);
+        } else {
+          console.error(error);
+        }
       }
     } else {
       console.error('User ID is null or no exercise selected');
@@ -54,8 +76,14 @@ export default function Routine() {
         await deleteData(
           'users/' + urlParams.userId + '/routines/' + urlParams.routineId + '/exercises/' + exerciseIdToRemove,
         );
+        setError(false);
       } catch (error) {
-        console.error(error);
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('Failed to fetch data:', error);
+          setError(true);
+        } else {
+          console.error(error);
+        }
       }
     } else {
       console.error('User ID is null');
@@ -85,6 +113,7 @@ export default function Routine() {
 
   return (
     <>
+      {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
       {exercises.length === 0 ? <p>No exercises found</p> : null}
       {[...exercises]
         .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
