@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { getData, postData } from '../DataService';
+import { useEffect, useRef, useState } from 'react';
+import { deleteData, getData, postData } from '../DataService';
 import { Routine } from '../types/Routine';
 import { Link, useParams } from 'react-router-dom';
 import errors from '../../metadata/errors.json';
@@ -12,28 +12,18 @@ export default function Routines() {
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const [error, setError] = useState(false);
-  const urlParams = useParams();
+  const { userId } = useParams();
 
-  const getRoutines = useCallback(async () => {
-    try {
-      const data: Routine[] = await getData('users/' + urlParams.userId + '/routines');
-      setError(false);
-      return data;
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        console.error('Failed to fetch data:', error);
-        setError(true);
-      } else {
-        console.error(error);
-      }
-    }
-  }, [urlParams]);
+  // Calling useParams() creates a new object every time the component is rendered. If the userId param is declared a dependency of the useEffect below and not made a ref, even if the value of userId doesn't change, the new object returned by useParams()is still seen as a change which will trigger the useEffect.
+  const userIdRef = useRef<string | undefined>();
+  userIdRef.current = userId;
 
-  async function createRoutine() {
-    if (urlParams.userId != null) {
+  useEffect(() => {
+    async function getRoutines() {
       try {
-        await postData('users/' + urlParams.userId + '/routines', { userId: urlParams.userId, name: input.name });
+        const data: Routine[] = await getData('users/' + userIdRef.current + '/routines');
         setError(false);
+        return data;
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
           console.error('Failed to fetch data:', error);
@@ -42,15 +32,50 @@ export default function Routines() {
           console.error(error);
         }
       }
+    }
+
+    getRoutines().then((value) => setRoutines(value ?? []));
+  }, []);
+
+  async function createRoutine() {
+    setCreateMode(false);
+    if (userId != null) {
+      try {
+        const response = await postData('users/' + userId + '/routines', { userId: userId, name: input.name });
+        setRoutines((prevRoutines) => [...prevRoutines, response]);
+      } catch (error) {
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('Failed to fetch data:', error);
+          setError(true);
+        } else {
+          console.error(error);
+        }
+      }
+      console.log(JSON.stringify(routines, null, 2));
+      setError(false);
     } else {
       console.error('User ID is null');
-      setCreateMode(false);
     }
   }
 
-  useEffect(() => {
-    getRoutines().then((value) => setRoutines(value ?? []));
-  }, [getRoutines]);
+  async function deleteRoutine(routineId: number) {
+    if (userId != null) {
+      try {
+        await deleteData('users/' + userId + '/routines/' + routineId);
+      } catch (error) {
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('Failed to fetch data:', error);
+          setError(true);
+        } else {
+          console.error(error);
+        }
+      }
+      setRoutines((prevRoutines) => prevRoutines.filter((r) => r.id !== routineId));
+      setError(false);
+    } else {
+      console.error('User ID is null');
+    }
+  }
 
   function handleClick() {
     setCreateMode(true);
@@ -61,8 +86,9 @@ export default function Routines() {
     setInput((prevInput) => ({ ...prevInput, [name]: value }));
   }
 
-  function handleSubmit() {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     if (input.name !== '') {
+      event.preventDefault();
       createRoutine();
     }
   }
@@ -74,11 +100,12 @@ export default function Routines() {
       {routines.map((routine) => (
         <div key={routine.id}>
           <Link to={`${routine.id}`}>{routine.name}</Link>
+          <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
         </div>
       ))}
       {!createMode && <button onClick={handleClick}>Add Routine</button>}
       {createMode && (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(event) => handleSubmit(event)}>
           <label>
             Routine Name:
             <input type="string" name="name" onChange={handleInput} />
