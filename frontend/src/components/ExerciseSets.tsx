@@ -1,3 +1,3 @@
 export default function ExerciseSets({ isActive }: { isActive: boolean }) {
-  return <div>{isActive && <h1>Exercise Sets</h1>}</div>;
+  return <div>{isActive && <h2>Exercise Sets</h2>}</div>;
 }
