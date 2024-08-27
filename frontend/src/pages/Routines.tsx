@@ -103,7 +103,7 @@ export default function Routines() {
           <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
         </div>
       ))}
-      {!createMode && <button onClick={handleClick}>Add Routine</button>}
+      {!createMode && <button onClick={handleClick}>Create routine</button>}
       {createMode && (
         <form onSubmit={(event) => handleSubmit(event)}>
           <label>

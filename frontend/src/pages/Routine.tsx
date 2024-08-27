@@ -145,11 +145,15 @@ export default function Routine() {
           <label htmlFor="dropdown">Select an option:</label>
           <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
             <option value="-1"></option>
-            {options.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.name}
-              </option>
-            ))}
+            {options
+              .filter(
+                (option) => !routineExercises.some((routineExercise) => routineExercise.exercise.id === option.id),
+              )
+              .map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
           </select>
         </div>
       )}

@@ -102,7 +102,7 @@ export default function Exercises() {
           <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
         </div>
       ))}
-      {!createMode && <button onClick={changeMode}>Add Exercise</button>}
+      {!createMode && <button onClick={changeMode}>Create exercise</button>}
       {createMode && (
         <form onSubmit={(event) => handleSubmit(event)}>
           <label>
