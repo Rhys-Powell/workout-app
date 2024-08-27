@@ -5,12 +5,14 @@ import { Link, useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const typedErrors: Errors = errors;
 
 export default function Routine() {
   const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
   const [selectorActive, setSelectorActive] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<Exercise[]>([]);
   const [error, setError] = useState(false);
   const { userId, routineId } = useParams();
@@ -115,47 +117,125 @@ export default function Routine() {
     setSelectorActive(false);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+    const { source, destination } = result;
+    const newItems = [...routineExercises];
+    const [removed] = newItems.splice(source.index, 1);
+    newItems.splice(destination.index, 0, removed);
+    newItems.forEach((item, index) => {
+      item.exerciseOrder = index + 1; // Start from 1 instead of 0
+    });
+    setRoutineExercises(newItems);
+  };
+
   return (
     <>
       {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {routineExercises.length === 0 ? <p>No exercises found</p> : null}
-      {[...routineExercises]
-        .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
-        .map((routineExercise) => (
-          <div key={routineExercise.id}>
-            <Link to={`/users/${userId}/exercises/${routineExercise.exercise.id}`}>
-              {routineExercise.exercise.name}
-            </Link>
-            <button onClick={() => removeRoutineExercise(routineExercise.exercise.id, routineExercise.id)}>
-              Remove
-            </button>
-          </div>
-        ))}
-      {!selectorActive && (
-        <button
-          onClick={() => {
-            showSelector();
-          }}
-        >
-          Add exercise
-        </button>
+      {!editMode && (
+        <>
+          {routineExercises.length === 0 && <p>No exercises found</p>}
+          {[...routineExercises]
+            .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+            .map((routineExercise) => (
+              <div key={routineExercise.id}>
+                <Link to={`/users/${userId}/exercises/${routineExercise.exercise.id}`}>
+                  {routineExercise.exercise.name}
+                </Link>
+              </div>
+            ))}
+          <button onClick={() => setEditMode(true)}>Edit</button>
+        </>
       )}
-      {selectorActive && (
-        <div>
-          <label htmlFor="dropdown">Select an option:</label>
-          <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
-            <option value="-1"></option>
-            {options
-              .filter(
-                (option) => !routineExercises.some((routineExercise) => routineExercise.exercise.id === option.id),
-              )
-              .map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-          </select>
-        </div>
+
+      {editMode && (
+        <>
+          <DragDropContext
+            onDragStart={(initial) => {
+              const { droppableId } = initial.source;
+              console.log(`Started dragging on ${droppableId}`);
+            }}
+            onDragEnd={handleDragEnd}
+          >
+            <Droppable droppableId="droppable-1">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    padding: 20,
+                    width: 250,
+                    minHeight: 500,
+                    border: '1px solid black',
+                  }}
+                >
+                  {[...routineExercises]
+                    .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+                    .map(
+                      (routineExercise, index) => (
+                        <Draggable key={routineExercise.id} draggableId={routineExercise.id.toString()} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                padding: 10,
+                                border: '1px solid black',
+                                marginBottom: 10,
+                                backgroundColor: 'black',
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              <Link to={`/users/${userId}/exercises/${routineExercise.exercise.id}`}>
+                                {routineExercise.exercise.name}
+                              </Link>
+                              <button
+                                onClick={() => removeRoutineExercise(routineExercise.exercise.id, routineExercise.id)}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
+                        </Draggable>
+                      ),
+                      // }
+                    )}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+          {!selectorActive && (
+            <button
+              onClick={() => {
+                showSelector();
+              }}
+            >
+              Add exercise
+            </button>
+          )}
+          {selectorActive && (
+            <div>
+              <label htmlFor="dropdown">Select an option:</label>
+              <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
+                <option value="-1"></option>
+                {options
+                  .filter(
+                    (option) => !routineExercises.some((routineExercise) => routineExercise.exercise.id === option.id),
+                  )
+                  .map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
+          {/* TODO: Add save functionality to sync these changes with the databse*/}
+          <button onClick={() => setEditMode(false)}>Save</button>
+        </>
       )}
     </>
   );
