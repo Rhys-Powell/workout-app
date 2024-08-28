@@ -25,7 +25,7 @@ export default function Stopwatch() {
   resetStopwatchRef.current = resetStopwatch;
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: number | NodeJS.Timeout;
 
     const startStopwatch = () => {
       intervalId = setInterval(() => {

@@ -28,7 +28,7 @@ export default function Countdown() {
   resetCountdownRef.current = resetCountdown;
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: number | NodeJS.Timeout;
 
     const startCountdown = () => {
       intervalId = setInterval(() => {
