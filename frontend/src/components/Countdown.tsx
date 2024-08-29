@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlay, faPlus, faStop } from '@fortawesome/free-solid-svg-icons';
 import './Countdown.css';
@@ -11,6 +11,7 @@ export default function Countdown() {
   const [timerStarted, setTimerStarted] = useState(false);
   const [showTimerInput, setShowTimerInput] = useState(false);
   const [startingCount, setStartingCount] = useState(defaultStartingCount);
+  const intervalRef = useRef(0);
 
   const formattedCount = (() => {
     const minutes = Math.floor(count / 60);
@@ -18,37 +19,28 @@ export default function Countdown() {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   })();
 
-  const resetCountdownRef = useRef<() => void>(() => {});
-
-  const resetCountdown = useCallback(() => {
+  function resetCountdown() {
     setCount(startingCount);
     setTimerStarted(false);
-  }, [startingCount]);
-
-  resetCountdownRef.current = resetCountdown;
+  }
 
   useEffect(() => {
-    let intervalId: number | NodeJS.Timeout;
-
-    const startCountdown = () => {
-      intervalId = setInterval(() => {
+    if (timerStarted) {
+      intervalRef.current = window.setInterval(() => {
         if (count === 0) {
           alert('Countdown finished!');
-          clearInterval(intervalId);
+          window.clearInterval(intervalRef.current);
           setTimerStarted(false);
-          resetCountdownRef.current();
         } else {
           setCount((prevCount) => prevCount - 1);
         }
       }, 1000);
-    };
-
-    if (timerStarted) {
-      startCountdown();
     }
 
     return () => {
-      clearInterval(intervalId);
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
     };
   }, [count, timerStarted]);
 
@@ -70,10 +62,12 @@ export default function Countdown() {
 
   function incrementCount() {
     setCount((prevCount) => prevCount + 1);
+    setStartingCount(count + 1);
   }
 
   function decrementCount() {
     setCount((prevCount) => prevCount - 1);
+    setStartingCount(count - 1);
   }
 
   return (
@@ -83,7 +77,7 @@ export default function Countdown() {
       ) : (
         <div className="countdown">
           <button onClick={resetCountdown}>Reset</button>
-          <button onClick={changeTimerDuration}>Set duration</button>
+          <button onClick={changeTimerDuration}>Choose duration</button>
           <button onClick={incrementCount}>
             <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
           </button>

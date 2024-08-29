@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import './Stopwatch.css';
@@ -8,6 +8,7 @@ const maxSecs = 5999;
 export default function Stopwatch() {
   const [count, setCount] = useState(0);
   const [timerStarted, setTimerStarted] = useState(false);
+  const intervalRef = useRef(0);
 
   const formattedCount = (() => {
     const minutes = Math.floor(count / 60);
@@ -15,37 +16,28 @@ export default function Stopwatch() {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   })();
 
-  const resetStopwatchRef = useRef<() => void>(() => {});
-
-  const resetStopwatch = useCallback(() => {
+  function resetStopwatch() {
     setCount(0);
     setTimerStarted(false);
-  }, []);
-
-  resetStopwatchRef.current = resetStopwatch;
+  }
 
   useEffect(() => {
-    let intervalId: number | NodeJS.Timeout;
-
-    const startStopwatch = () => {
-      intervalId = setInterval(() => {
+    if (timerStarted) {
+      intervalRef.current = window.setInterval(() => {
         if (count === maxSecs) {
           alert('Stopwatch finished!');
-          clearInterval(intervalId);
+          window.clearInterval(intervalRef.current);
           setTimerStarted(false);
-          resetStopwatchRef.current();
         } else {
           setCount((prevCount) => prevCount + 1);
         }
       }, 1000);
-    };
-
-    if (timerStarted) {
-      startStopwatch();
     }
 
     return () => {
-      clearInterval(intervalId);
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
     };
   }, [count, timerStarted]);
 
