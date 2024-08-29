@@ -1,4 +1,5 @@
-const API_BASE_URL = await import.meta.env.VITE_PROXY;
+// const API_BASE_URL = await import.meta.env.VITE_PROXY;
+const API_BASE_URL = 'http://localhost:8080';
 
 export const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
   try {
