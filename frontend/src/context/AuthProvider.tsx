@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       console.log("api base url: " + API_BASE_URL);
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch(API_BASE_URL + '/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
