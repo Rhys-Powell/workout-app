@@ -1,11 +1,18 @@
 {
   "routes": [
     {
+      "route": "/assets/*",
+      "serve": "/assets/{R:0}"
+    },
+    {
       "route": "/*",
       "rewrite": "/index.html"
     }
   ],
   "navigationFallback": {
     "rewrite": "/index.html"
+  },
+  "404": {
+    "serve": "/404.html"
   }
 }

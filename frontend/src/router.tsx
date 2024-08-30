@@ -7,6 +7,7 @@ import PrivateRoute from './context/RouteGuard';
 import Routines from './pages/Routines';
 import Routine from './pages/Routine';
 import { Exercise } from './components/Exercise';
+import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: '*',
+        element: <NotFound />,
+      }
     ],
   },
 ]);
