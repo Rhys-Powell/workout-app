@@ -14,9 +14,9 @@ public static class RoutineExerciseEndpoints
 
     public static RouteGroupBuilder MapRoutineExercisesEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("users/{userId}/routines/{routineId}/exercises").WithParameterValidation();
+        var group = app.MapGroup("api/users/{userId}/routines/{routineId}/exercises").WithParameterValidation();
 
-        // GET users/{userId}/routines/{routineId}/exercises?includeDetails=true
+        // GET api/users/{userId}/routines/{routineId}/exercises?includeDetails=true
         group.MapGet("/", async (int userId, int routineId, bool includeDetails, WorkoutContext dbContext) =>
         {
             var routineExercises = await dbContext.RoutineExercise
@@ -36,7 +36,7 @@ public static class RoutineExerciseEndpoints
         })
         .WithName(GetRoutineExerciseEndpointName);
 
-        // POST users/{userId}/routines/{routineId}/exercises
+        // POST api/users/{userId}/routines/{routineId}/exercises
         group.MapPost("/", async (int userId, [FromQuery] int exerciseId, int routineId, WorkoutContext dbContext) =>
         {
             //Validate routineId
@@ -71,7 +71,7 @@ public static class RoutineExerciseEndpoints
             return Results.CreatedAtRoute(GetRoutineExerciseEndpointName, new { routineId, exerciseId }, newRoutineExercise.Entity.ToDto());
         });
 
-        // DELETE users/{userId}/routines/{routineId}/exercises/{exerciseId}
+        // DELETE api/users/{userId}/routines/{routineId}/exercises/{exerciseId}
         group.MapDelete("/{exerciseId}", async (int routineId, int exerciseId, WorkoutContext dbContext) =>
         {
             await dbContext.RoutineExercise

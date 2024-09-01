@@ -11,7 +11,8 @@ public static class AuthenticationEndpoints
 {
     public static void MapAuthenticationEndpoints(this WebApplication app)
     {
-        app.MapPost("/login", (LoginRequest loginRequest, WorkoutContext dbContext) =>
+        // POST api/login
+        app.MapPost("api/login", (LoginRequest loginRequest, WorkoutContext dbContext) =>
         {
             User? user = dbContext.Users.FirstOrDefault(u => u.Email == loginRequest.Email);
 

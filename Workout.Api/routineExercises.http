@@ -1,10 +1,10 @@
-GET http://localhost:5257/users/1/routines/1/exercises?includeDetails=true
+GET http://localhost:5257/api/users/1/routines/1/exercises?includeDetails=true
 
 ###
-GET http://localhost:5257/users/1/routines/1/exercises?includeDetails=false
+GET http://localhost:5257/api/users/1/routines/1/exercises?includeDetails=false
 
 ###
-POST http://localhost:5257/users/1/routines/1/exercises
+POST http://localhost:5257/api/users/1/routines/1/exercises
 Content-Type: application/json
 
 {

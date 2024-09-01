@@ -12,9 +12,9 @@ public static class ExerciseEndpoints
 
     public static RouteGroupBuilder MapExerciseEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("users/{userId}/exercises").WithParameterValidation();
+        var group = app.MapGroup("api/users/{userId}/exercises").WithParameterValidation();
 
-        // GET users/{userId}/exercises
+        // GET api/users/{userId}/exercises
         group.MapGet("/", async (int userId, WorkoutContext dbContext) =>
         {
             var exercises = await dbContext.Exercises
@@ -26,7 +26,7 @@ public static class ExerciseEndpoints
             return Results.Ok(exercises);
         });
 
-        // GET users/{userId}/exercises/{exerciseId}
+        // GET api/users/{userId}/exercises/{exerciseId}
         group.MapGet("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
         {
             var exercise = await dbContext.Exercises
@@ -37,7 +37,7 @@ public static class ExerciseEndpoints
         })
             .WithName(GetExerciseEndpointName);
 
-        // POST users/{userId}/exercises
+        // POST api/users/{userId}/exercises
         group.MapPost("/", async (int userId, ExerciseDto newExercise, WorkoutContext dbContext) =>
         {
             Exercise exercise = newExercise.ToEntity();
@@ -48,7 +48,7 @@ public static class ExerciseEndpoints
             return Results.CreatedAtRoute(GetExerciseEndpointName, new { userId, exerciseId = exercise.Id }, exercise.ToDto());
         });
 
-        //PUT users/{userId}/exercises/{exerciseId}
+        //PUT api/users/{userId}/exercises/{exerciseId}
         group.MapPut("/{exerciseId}", async (int userId, int exerciseId, ExerciseDto updatedExercise, WorkoutContext dbContext) =>
         {
             var existingExercise = await dbContext.Exercises
@@ -66,7 +66,7 @@ public static class ExerciseEndpoints
             return Results.NoContent();
         });
 
-        // DELETE users/{userId}/exercises/{exerciseId}
+        // DELETE api/users/{userId}/exercises/{exerciseId}
         group.MapDelete("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
         {
             await dbContext.Exercises

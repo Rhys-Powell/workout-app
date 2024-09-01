@@ -11,9 +11,9 @@ public static class RoutineEndpoints
 
     public static RouteGroupBuilder MapRoutineEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("users/{userId}/routines").WithParameterValidation();
+        var group = app.MapGroup("api/users/{userId}/routines").WithParameterValidation();
 
-        // GET users/{userId}/routines
+        // GET api/users/{userId}/routines
         group.MapGet("/", async (int userId, WorkoutContext dbContext) =>
         {
             var routines = await dbContext.Routines
@@ -29,7 +29,7 @@ public static class RoutineEndpoints
             return Results.Ok(routines);
         });
 
-        // GET users/{userId}/routines/{routineId}
+        // GET api/users/{userId}/routines/{routineId}
         group.MapGet("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
         {
             var routine = await dbContext.Routines
@@ -40,7 +40,7 @@ public static class RoutineEndpoints
         })
             .WithName(GetRoutineEndpointName);
 
-        // POST users/{userId}/routines
+        // POST api/users/{userId}/routines
         group.MapPost("/", async (int userId, RoutineDto newRoutine, WorkoutContext dbContext) =>
         {
             var routine = newRoutine.ToEntity();
@@ -51,7 +51,7 @@ public static class RoutineEndpoints
             return Results.CreatedAtRoute(GetRoutineEndpointName, new { userId, routineId = routine.Id }, routine.ToDto());
         });
 
-        //PUT users/{userId}/routines/{routineId}
+        //PUT api/users/{userId}/routines/{routineId}
         group.MapPut("/{routineId}", async (int userId, int routineId, RoutineDto updatedWorkout, WorkoutContext dbContext) =>
         {
             var existingRoutine = await dbContext.Routines
@@ -70,7 +70,7 @@ public static class RoutineEndpoints
             return Results.NoContent();
         });
 
-        // DELETE users/{userId}/routines/{routineId}
+        // DELETE api/users/{userId}/routines/{routineId}
         group.MapDelete("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
         {
             await dbContext.Routines

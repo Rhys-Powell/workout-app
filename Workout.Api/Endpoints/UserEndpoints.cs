@@ -12,9 +12,9 @@ public static class UserEndpoints
 
     public static RouteGroupBuilder MapUserEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("users").WithParameterValidation();
+        var group = app.MapGroup("api/users").WithParameterValidation();
 
-        // GET /users
+        // GET api/users
         group.MapGet("/", async (WorkoutContext dbContext) =>
         {
             var users = await dbContext.Users
@@ -25,7 +25,7 @@ public static class UserEndpoints
             return Results.Ok(users);
         });
 
-        // GET /users/{id}
+        // GET api/users/{id}
         group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>
         {
             User? user = await dbContext.Users.FindAsync(id);
@@ -34,7 +34,7 @@ public static class UserEndpoints
         })
         .WithName(GetUserEndpointName);
 
-        // POST /users
+        // POST api/users
         group.MapPost("/", async (UserDto newUser, WorkoutContext dbContext) =>
         {
             User user = newUser.ToEntity();
@@ -45,7 +45,7 @@ public static class UserEndpoints
             return Results.CreatedAtRoute(GetUserEndpointName, new { id = user.Id }, user.ToDto());
         });
 
-        // PUT /users/{id}
+        // PUT api/users/{id}
         group.MapPut("/{id}", async (int id, UserDto updatedUser, WorkoutContext dbContext) =>
         {
             var existingUser = await dbContext.Users.FindAsync(id);
@@ -63,7 +63,7 @@ public static class UserEndpoints
             return Results.NoContent();
         });
 
-        // DELETE /users/{id}
+        // DELETE api/users/{id}
         group.MapDelete("/{id}", async (int id, WorkoutContext dbContext) =>
         {
             await dbContext.Users
