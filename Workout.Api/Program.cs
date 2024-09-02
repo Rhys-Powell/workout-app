@@ -13,8 +13,16 @@ var server = builder.Configuration["DB_SERVER"];
 var port = builder.Configuration["DB_PORT"];
 var database = builder.Configuration["DB_DATABASE"];
 var user = builder.Configuration["DB_USER"];
+string? password;
 
-var password = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+{
+    password = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
+}
+else
+{
+    password = builder.Configuration["DB_PASSWORD"];
+}
 
 var connectionString = $"Server={server};Port={port};Database={database};User={user};Password={password};";
 
