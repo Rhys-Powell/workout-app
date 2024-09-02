@@ -7,7 +7,15 @@ using Workout.Api.Endpoints;
 var builder = WebApplication.CreateBuilder(args);
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 39));
-var connectionString = builder.Configuration.GetSection("DB_CONNECTION_STRING").Value;
+
+var server = builder.Configuration["DB_SERVER"];
+var port = builder.Configuration["DB_PORT"];
+var database = builder.Configuration["DB_DATABASE"];
+var user = builder.Configuration["DB_USER"];
+
+var password = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
+
+var connectionString = $"Server={server};Port={port};Database={database};User={user};Password={password};";
 
 builder.Services.AddDbContext<WorkoutContext>(
             dbContextOptions => dbContextOptions
