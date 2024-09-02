@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using Workout.Api.Data;
 using Workout.Api.Endpoints;
 
@@ -21,6 +22,20 @@ builder.Services.AddDbContext<WorkoutContext>(
             dbContextOptions => dbContextOptions
                 .UseMySql(connectionString, serverVersion)
         );
+
+// Test the database connection
+using (var connection = new MySqlConnection(connectionString))
+{
+    try
+    {
+        connection.Open();
+        Console.WriteLine("Connection to MySQL database was successful.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to connect to MySQL database: {ex.Message}");
+    }
+}
 
 builder.Services.AddCors(options =>
 {

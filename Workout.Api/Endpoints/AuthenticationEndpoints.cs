@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.EntityFrameworkCore;
 using Workout.Api.Data;
-using Workout.Api.Dtos;
 using Workout.Api.Entities;
-using Workout.Api.Mapping;
 
 namespace Workout.Api.Endpoints;
 
