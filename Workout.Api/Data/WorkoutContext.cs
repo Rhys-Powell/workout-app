@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Workout.Api.Entities;
-using Entities = Workout.Api.Entities;
 
 namespace Workout.Api.Data;
 
