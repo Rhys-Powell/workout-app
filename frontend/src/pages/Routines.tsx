@@ -22,6 +22,7 @@ export default function Routines() {
     async function getRoutines() {
       try {
         const data: Routine[] = await getData('users/' + userIdRef.current + '/routines');
+        console.log('Data:', data);
         setError(false);
         return data;
       } catch (error) {
@@ -96,13 +97,14 @@ export default function Routines() {
   return (
     <>
       {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {routines.length === 0 && <p>No routines found</p>}
-      {routines.map((routine) => (
-        <div key={routine.id}>
-          <Link to={`${routine.id}`}>{routine.name}</Link>
-          <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
-        </div>
-      ))}
+      {routines.length === 0 ? <p>No routines found</p> :
+        routines.map((routine) => (
+          <div key={routine.id}>
+            <Link to={`${routine.id}`}>{routine.name}</Link>
+            <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
+          </div>
+        ))
+      }
       {!createMode && <button onClick={handleClick}>Create routine</button>}
       {createMode && (
         <form onSubmit={(event) => handleSubmit(event)}>

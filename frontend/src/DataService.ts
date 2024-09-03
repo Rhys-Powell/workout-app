@@ -1,8 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_PROXY;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
   try {
-    const url = new URL(`${API_BASE_URL}/${endpoint}`);
+    const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
     Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
     const response = await fetch(url, {
       method: 'GET',
@@ -21,7 +21,7 @@ export const getData = async (endpoint: string, params: { [key: string]: string 
 
 export const postData = async (endpoint: string, payload: object) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const postData = async (endpoint: string, payload: object) => {
 
 export const deleteData = async (endpoint: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const deleteData = async (endpoint: string) => {
 
 export const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}) => {
   try {
-    const url = new URL(`${API_BASE_URL}/${endpoint}`);
+    const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
     Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
     const response = await fetch(url, {
       method: 'POST',

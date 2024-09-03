@@ -22,10 +22,6 @@ public static class RoutineEndpoints
                 .AsNoTracking()
                 .ToListAsync();
 
-            if (routines == null || !routines.Any())
-            {
-                return Results.NotFound("No routines found for this user.");
-            }
             return Results.Ok(routines);
         });
 

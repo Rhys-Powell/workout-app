@@ -95,12 +95,12 @@ export default function Exercises() {
   return (
     <>
       {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {exercises.length === 0 && <p>No exercises found</p>}
-      {exercises.map((exercise) => (
-        <div key={exercise.id}>
-          <Link to={`${exercise.id}`}>{exercise.name}</Link>
-          <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
-        </div>
+      {exercises.length === 0 ? <p>No exercises found</p> :
+        exercises.map((exercise) => (
+          <div key={exercise.id}>
+            <Link to={`${exercise.id}`}>{exercise.name}</Link>
+            <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
+          </div>
       ))}
       {!createMode && <button onClick={changeMode}>Create exercise</button>}
       {createMode && (

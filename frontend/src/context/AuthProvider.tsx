@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.VITE_PROXY;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export interface AuthContextType {
   user: {
@@ -39,8 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      console.log("api base url: " + API_BASE_URL);
-      const response = await fetch(API_BASE_URL + '/login', {
+      const response = await fetch(API_BASE_URL + '/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
