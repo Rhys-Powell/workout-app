@@ -6,6 +6,7 @@ import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import Modal from '../components/Modal';
 
 const typedErrors: Errors = errors;
 
@@ -106,9 +107,8 @@ export default function Routine() {
     }
   }
 
-  function showSelector() {
+  function populateSelectorList() {
     getExercises().then((data) => setOptions((data as Exercise[]) ?? []));
-    setSelectorActive(true);
   }
 
   function handleSelectorChange(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -152,10 +152,6 @@ export default function Routine() {
       {editMode && (
         <>
           <DragDropContext
-            onDragStart={(initial) => {
-              const { droppableId } = initial.source;
-              console.log(`Started dragging on ${droppableId}`);
-            }}
             onDragEnd={handleDragEnd}
           >
             <Droppable droppableId="droppable-1">
@@ -210,14 +206,15 @@ export default function Routine() {
           {!selectorActive && (
             <button
               onClick={() => {
-                showSelector();
+                setSelectorActive(true)
+                populateSelectorList();
               }}
             >
               Add exercise
             </button>
           )}
           {selectorActive && (
-            <div>
+            <Modal onClose={() => setSelectorActive(false)}>
               <label htmlFor="dropdown">Select an option:</label>
               <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
                 <option value="-1"></option>
@@ -231,8 +228,8 @@ export default function Routine() {
                     </option>
                   ))}
               </select>
-            </div>
-          )}
+            </Modal>
+           )} 
           {/* TODO: Add save functionality to sync these changes with the databse*/}
           <button onClick={() => setEditMode(false)}>Save</button>
         </>
