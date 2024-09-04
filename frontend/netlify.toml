@@ -1,7 +1,7 @@
 [build]
 base = "/"
 publish = "dist"
-command = "tsc -b && vite build"
+command = "vite build"
 
 [[redirects]]
 from = "/*"
