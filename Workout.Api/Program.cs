@@ -42,7 +42,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173", "https://rhys-powell.github.io")
+                .WithOrigins("http://localhost:5173", "https://rhys-powell.github.io", "https://main--workout-app-rwp.netlify.app")
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         });
