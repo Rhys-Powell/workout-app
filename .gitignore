@@ -489,3 +489,5 @@ $RECYCLE.BIN/
 # Ignore database files
 *.db
 *.db-*
+# Local Netlify folder
+.netlify
