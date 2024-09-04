@@ -22,7 +22,6 @@ export default function Routines() {
     async function getRoutines() {
       try {
         const data: Routine[] = await getData('users/' + userIdRef.current + '/routines');
-        console.log('Data:', data);
         setError(false);
         return data;
       } catch (error) {
@@ -52,7 +51,6 @@ export default function Routines() {
           console.error(error);
         }
       }
-      console.log(JSON.stringify(routines, null, 2));
       setError(false);
     } else {
       console.error('User ID is null');
