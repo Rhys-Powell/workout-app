@@ -9,61 +9,66 @@ import Routine from './pages/Routine';
 import { Exercise } from './components/Exercise';
 import NotFound from './pages/NotFound';
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      children: [
+        {
+          path: '',
+          element: (
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: '/login',
+          element: <Login />,
+        },
+        {
+          path: 'users/:userId/exercises',
+          element: (
+            <PrivateRoute>
+              <Exercises />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'users/:userId/exercises/:exerciseId',
+          element: (
+            <PrivateRoute>
+              <Exercise />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'users/:userId/routines',
+          element: (
+            <PrivateRoute>
+              <Routines />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'users/:userId/routines/:routineId',
+          element: (
+            <PrivateRoute>
+              <Routine />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: '*',
+          element: <NotFound />,
+        },
+      ],
+    },
+  ], 
   {
-    path: '/',
-    element: <App />,
-    children: [
-      {
-        path: '',
-        element: (
-          <PrivateRoute>
-            <Home />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: '/login',
-        element: <Login />,
-      },
-      {
-        path: 'users/:userId/exercises',
-        element: (
-          <PrivateRoute>
-            <Exercises />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: 'users/:userId/exercises/:exerciseId',
-        element: (
-          <PrivateRoute>
-            <Exercise />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: 'users/:userId/routines',
-        element: (
-          <PrivateRoute>
-            <Routines />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: 'users/:userId/routines/:routineId',
-        element: (
-          <PrivateRoute>
-            <Routine />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: '*',
-        element: <NotFound />,
-      }
-    ],
-  },
-]);
+    basename: process.env.NODE_ENV === 'production' ? '/workout-app/' : '',
+  }
+);
 
 export default router;
