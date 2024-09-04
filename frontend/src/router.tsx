@@ -66,9 +66,6 @@ const router = createBrowserRouter(
       ],
     },
   ], 
-  {
-    basename: process.env.NODE_ENV === 'production' ? '/workout-app/' : '',
-  }
 );
 
 export default router;
