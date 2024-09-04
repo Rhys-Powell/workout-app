@@ -1,9 +1,9 @@
 [build]
-base = "/frontend"
+base = "/"
 publish = "dist"
 command = "tsc -b && vite build"
 
 [[redirects]]
 from = "/*"
-to = "/frontend/index.html"
+to = "/index.html"
 status = 200
