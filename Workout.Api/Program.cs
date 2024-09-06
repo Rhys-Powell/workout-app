@@ -22,20 +22,6 @@ builder.Services.AddDbContext<WorkoutContext>(
                 .UseMySql(connectionString, serverVersion)
         );
 
-// Test the database connection
-using (var connection = new MySqlConnection(connectionString))
-{
-    try
-    {
-        connection.Open();
-        Console.WriteLine("Connection to MySQL database was successful.");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Failed to connect to MySQL database: {ex.Message}");
-    }
-}
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -83,5 +69,19 @@ app.MapRoutineExercisesEndpoints();
 app.MapAuthenticationEndpoints();
 
 await app.MigrateDbAsync();
+
+// Test the database connection
+using (var connection = new MySqlConnection(connectionString))
+{
+    try
+    {
+        connection.Open();
+        Console.WriteLine("Connection to MySQL database was successful.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to connect to MySQL database: {ex.Message}");
+    }
+}
 
 app.Run();
