@@ -34,7 +34,8 @@ public static class RoutineExerciseEndpoints
             }
             return Results.Ok(routineExercises.Select(re => re.ToDto()));
         })
-        .WithName(GetRoutineExerciseEndpointName);
+        .WithName(GetRoutineExerciseEndpointName)
+        .RequireAuthorization("all");
 
         // POST api/users/{userId}/routines/{routineId}/exercises
         group.MapPost("/", async (int userId, [FromQuery] int exerciseId, int routineId, WorkoutContext dbContext) =>
@@ -69,7 +70,7 @@ public static class RoutineExerciseEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.CreatedAtRoute(GetRoutineExerciseEndpointName, new { routineId, exerciseId }, newRoutineExercise.Entity.ToDto());
-        });
+        }).RequireAuthorization("all");
 
         // DELETE api/users/{userId}/routines/{routineId}/exercises/{exerciseId}
         group.MapDelete("/{exerciseId}", async (int routineId, int exerciseId, WorkoutContext dbContext) =>
@@ -80,7 +81,7 @@ public static class RoutineExerciseEndpoints
 
             return Results.NoContent();
         }
-        );
+        ).RequireAuthorization("all");
 
         return group;
     }

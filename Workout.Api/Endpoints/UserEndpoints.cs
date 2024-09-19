@@ -23,7 +23,8 @@ public static class UserEndpoints
                 .ToListAsync();
 
             return Results.Ok(users);
-        });
+        })
+        .RequireAuthorization("all");
 
         // GET api/users/{id}
         group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>
@@ -32,7 +33,8 @@ public static class UserEndpoints
 
             return user is null ? Results.NotFound() : Results.Ok(user.ToDto());
         })
-        .WithName(GetUserEndpointName);
+        .WithName(GetUserEndpointName)
+        .RequireAuthorization("all");
 
         // POST api/users
         group.MapPost("/", async (UserDto newUser, WorkoutContext dbContext) =>
@@ -61,7 +63,8 @@ public static class UserEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
-        });
+        })
+        .RequireAuthorization("all");
 
         // DELETE api/users/{id}
         group.MapDelete("/{id}", async (int id, WorkoutContext dbContext) =>
@@ -71,7 +74,8 @@ public static class UserEndpoints
                 .ExecuteDeleteAsync();
 
             return Results.NoContent();
-        });
+        })
+        .RequireAuthorization("all");
 
         return group;
     }

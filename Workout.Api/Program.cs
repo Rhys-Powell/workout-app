@@ -1,6 +1,10 @@
+using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
 using Workout.Api.Data;
 using Workout.Api.Endpoints;
@@ -34,7 +38,35 @@ builder.Services.AddCors(options =>
         });
 });
 
+var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+    options.Audience = builder.Configuration["Auth0:Audience"];
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        NameClaimType = ClaimTypes.NameIdentifier
+    };
+});
+
+builder.Services
+  .AddAuthorization(options =>
+  {
+      options.AddPolicy(
+        "all",
+        policy => policy.Requirements.Add(
+          new HasScopeRequirement("all", domain)
+        )
+      );
+  });
+
+builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+
 var app = builder.Build();
+
+app.UseAuthorization();
+app.UseAuthorization();
 
 if (app.Environment.IsProduction())
 {

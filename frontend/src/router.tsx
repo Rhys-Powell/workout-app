@@ -2,12 +2,15 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
 import Exercises from './pages/Exercises';
-import Login from './pages/Login';
-import PrivateRoute from './context/RouteGuard';
 import Routines from './pages/Routines';
 import Routine from './pages/Routine';
 import { Exercise } from './components/Exercise';
 import NotFound from './pages/NotFound';
+import { CallbackPage } from './pages/CallbackPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import Profile from './pages/Profile';
+import SignupForm from './components/SignupForm';
+// import AuthLock from './components/AuthLock';
 
 const router = createBrowserRouter(
   [
@@ -17,52 +20,64 @@ const router = createBrowserRouter(
       children: [
         {
           path: '',
-          element: (
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          ),
+          element: <Home />,
         },
         {
-          path: '/login',
-          element: <Login />,
+          path: 'signup',
+          element: <SignupForm />,
         },
+        {
+          path: 'profile',
+          element: (
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          ),
+        },
+
         {
           path: 'users/:userId/exercises',
           element: (
-            <PrivateRoute>
+            <ProtectedRoute>
               <Exercises />
-            </PrivateRoute>
+            </ProtectedRoute>
           ),
         },
         {
           path: 'users/:userId/exercises/:exerciseId',
           element: (
-            <PrivateRoute>
+            <ProtectedRoute>
               <Exercise />
-            </PrivateRoute>
+            </ProtectedRoute>
           ),
         },
         {
           path: 'users/:userId/routines',
           element: (
-            <PrivateRoute>
+            <ProtectedRoute>
               <Routines />
-            </PrivateRoute>
+            </ProtectedRoute>
           ),
         },
         {
           path: 'users/:userId/routines/:routineId',
           element: (
-            <PrivateRoute>
+            <ProtectedRoute>
               <Routine />
-            </PrivateRoute>
+            </ProtectedRoute>
           ),
+        },
+        {
+          path: '/callback',
+          element: (
+              <CallbackPage />
+          )
         },
         {
           path: '*',
           element: <NotFound />,
         },
+        
       ],
     },
   ], 
