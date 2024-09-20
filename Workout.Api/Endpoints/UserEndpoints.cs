@@ -23,8 +23,8 @@ public static class UserEndpoints
                 .ToListAsync();
 
             return Results.Ok(users);
-        })
-        .RequireAuthorization("all");
+        });
+        // .RequireAuthorization("all");
 
         // GET api/users/{id}
         group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>

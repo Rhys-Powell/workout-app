@@ -11,5 +11,7 @@ public class UserDto
 
     [EmailAddress]
     public required string Email { get; set; }
+
+    public required string Auth0Id { get; set; }
 }
 

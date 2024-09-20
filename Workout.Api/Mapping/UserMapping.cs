@@ -11,7 +11,8 @@ public static class UserMapping
         {
             Id = user.Id,
             Name = user.Name,
-            Email = user.Email
+            Email = user.Email,
+            Auth0Id = user.Auth0Id
         };
     }
 
@@ -21,7 +22,8 @@ public static class UserMapping
         {
             Id = user.Id,
             Name = user.Name,
-            Email = user.Email
+            Email = user.Email,
+            Auth0Id = user.Auth0Id
         };
     }
 }

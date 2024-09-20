@@ -10,7 +10,7 @@ public class User
 
     public required string Email { get; set; }
 
-    // public int auth0_user_id { get; set; }
+    public required string Auth0Id { get; set; }
 
     // Navigation properties
     public ICollection<Routine> Routines { get; set; } = new List<Routine>();
