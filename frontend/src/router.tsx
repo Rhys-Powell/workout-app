@@ -10,7 +10,6 @@ import { CallbackPage } from './pages/CallbackPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Profile from './pages/Profile';
 import SignupForm from './components/SignupForm';
-// import AuthLock from './components/AuthLock';
 
 const router = createBrowserRouter(
   [
@@ -34,7 +33,6 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           ),
         },
-
         {
           path: 'users/:userId/exercises',
           element: (

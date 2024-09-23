@@ -23,7 +23,7 @@ public static class RoutineEndpoints
                 .ToListAsync();
 
             return Results.Ok(routines);
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         // GET api/users/{userId}/routines/{routineId}
         group.MapGet("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
@@ -46,7 +46,7 @@ public static class RoutineEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.CreatedAtRoute(GetRoutineEndpointName, new { userId, routineId = routine.Id }, routine.ToDto());
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         //PUT api/users/{userId}/routines/{routineId}
         group.MapPut("/{routineId}", async (int userId, int routineId, RoutineDto updatedWorkout, WorkoutContext dbContext) =>
@@ -65,7 +65,7 @@ public static class RoutineEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         // DELETE api/users/{userId}/routines/{routineId}
         group.MapDelete("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
@@ -75,7 +75,7 @@ public static class RoutineEndpoints
                 .ExecuteDeleteAsync();
 
             return Results.NoContent();
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         return group;
     }

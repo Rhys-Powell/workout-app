@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
-import { deleteData, getData, postDataWithQueryString } from '../DataService';
+import DataService from '../DataService';
 import { Link, useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Modal from '../components/Modal';
+import { useAuth } from '../context/UseAuthHook';
+import { useCurrentUser } from '../context/UseCurrentUserHook';
 
 const typedErrors: Errors = errors;
 
@@ -16,19 +18,19 @@ export default function Routine() {
   const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<Exercise[]>([]);
   const [error, setError] = useState(false);
-  const { userId, routineId } = useParams();
-
-  // Calling useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useParams()is still seen as a change which will trigger the useEffect.
-  const userIdRef = useRef<string | undefined>();
-  const routineIdRef = useRef<string | undefined>();
-
-  userIdRef.current = userId;
-  routineIdRef.current = routineId;
+  // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
+  const { currentUser }= useCurrentUser(); 
+  const userId = currentUser?.id;
+  const userIdRef = useRef<string | undefined>(userId?.toString());  
+  const { routineId } = useParams();
+  const routineIdRef = useRef<string | undefined>(routineId);
+  const { token } = useAuth();
+  const dataService = useMemo(() => DataService(token), [token]);
 
   useEffect(() => {
     async function getRoutineExercises() {
       try {
-        const data: RoutineExercise[] = await getData(
+        const data: RoutineExercise[] = await dataService.getData(
           'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises',
           {
             includeDetails: 'true',
@@ -46,11 +48,11 @@ export default function Routine() {
     }
 
     getRoutineExercises().then((value) => setRoutineExercises(value ?? []));
-  }, []);
+  }, [dataService]);
 
   async function getExercises() {
     try {
-      const data: Exercise[] = await getData('users/' + userId + '/exercises');
+      const data: Exercise[] = await dataService.getData('users/' + userId + '/exercises');
       setError(false);
       return data;
     } catch (error) {
@@ -66,7 +68,7 @@ export default function Routine() {
   async function addRoutineExercise(selectedId: number) {
     if (userIdRef.current != null && selectedId > -1) {
       try {
-        const response = await postDataWithQueryString(
+        const response = await dataService.postDataWithQueryString(
           'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises',
           {
             exerciseId: selectedId.toString(),
@@ -90,7 +92,7 @@ export default function Routine() {
   async function removeRoutineExercise(exerciseId: number, routineExerciseId: number) {
     if (userId != null) {
       try {
-        await deleteData('users/' + userId + '/routines/' + routineId + '/exercises/' + exerciseId);
+        await dataService.deleteData('users/' + userId + '/routines/' + routineId + '/exercises/' + exerciseId);
         setError(false);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {

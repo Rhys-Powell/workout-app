@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { getData, postData, deleteData } from '../DataService';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
+import { useCurrentUser } from '../context/UseCurrentUserHook';
+import DataService from '../DataService';
+import { useAuth } from '../context/UseAuthHook';
 
 const typedErrors: Errors = errors;
 
@@ -12,21 +14,26 @@ export default function Exercises() {
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const [error, setError] = useState(false);
-  const { userId } = useParams();
-
-  // Calling useParams() creates a new object every time the component is rendered. If the userId param is declared a dependency of the useEffect below and not made a ref, even if the value of userId doesn't change, the new object returned by useParams()is still seen as a change which will trigger the useEffect.
-  const userIdRef = useRef<string | undefined>();
-  userIdRef.current = userId;
+   // Calling useCurrentUser() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()is still seen as a change which will trigger the useEffect in an infinite loop.
+  const { currentUser }= useCurrentUser(); 
+  const userId = currentUser?.id;
+  const userIdRef = useRef<string | undefined>(userId?.toString()); 
+  const { token } = useAuth();
+  const dataService = useMemo(() => DataService(token), [token]);
 
   useEffect(() => {
     async function getExercises() {
       try {
-        const data: Exercise[] = await getData('users/' + userIdRef.current + '/exercises');
+        const response = await dataService.getData('users/' + userIdRef.current + '/exercises');
         setError(false);
-        return data;
+        if (Array.isArray(response)) {
+          return response;
+        } else {
+          console.error('Expected response to be an array');
+        }
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
+          console.error('Failed to fetch ', error);
           setError(true);
         } else {
           console.error(error);
@@ -35,13 +42,13 @@ export default function Exercises() {
     }
 
     getExercises().then((value) => setExercises(value ?? []));
-  }, []);
+  }, [dataService]);
 
   async function createExercise() {
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await postData('users/' + userId + '/exercises', { userId: userId, name: input.name });
+        const response = await dataService.postData('users/' + userId + '/exercises', { userId: userId, name: input.name });
         setExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -60,7 +67,7 @@ export default function Exercises() {
   async function deleteExercise(exerciseId: number) {
     if (userId != null) {
       try {
-        await deleteData('users/' + userId + '/exercises/' + exerciseId);
+        await dataService.deleteData('users/' + userId + '/exercises/' + exerciseId);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
           console.error('Failed to fetch data:', error);

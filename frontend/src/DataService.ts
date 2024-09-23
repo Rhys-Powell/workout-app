@@ -1,74 +1,63 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
+const DataService = (token: string | null) => {
+  const apiRequest: (endpoint: string, params?: { [key: string]: string; }, options?: RequestInit) => Promise<Response> = async (endpoint, params = {}, options = {}) => {
   try {
+    
     const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
     Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
 
-    const data = await response.json();
-    return data;
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+    const response = await fetch(url, options);
+    return response;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const postData = async (endpoint: string, payload: object) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
+  const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
+    const response = await apiRequest(endpoint, params);
+    return response.json();
+  };
+
+  const postData = async (endpoint: string, data: object,  params: { [key: string]: string } = {}) => {
+    const response = await apiRequest(endpoint, params, {
       method: 'POST',
+      body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
     });
+      return response.json();
+  };    
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const deleteData = async (endpoint: string) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
+  const deleteData = async (endpoint: string, params: { [key: string]: string } = {}) => {
+    const response = await apiRequest(endpoint, params, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
     if (response.status === 204) {
       return null;
     }
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+    return response.json();
+  };
 
-export const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}) => {
-  try {
-    const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
-    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-    const response = await fetch(url, {
+  const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}) => {
+    const response = await apiRequest(endpoint, params, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
+    return response.json();
+  };
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+return {
+  getData,
+  postData,
+  deleteData,
+  postDataWithQueryString
 };
+}
+
+export default DataService;

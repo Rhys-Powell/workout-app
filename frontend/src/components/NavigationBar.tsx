@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import './NavigationBar.css';
-import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from './LoginButton';
 import SignupButton from './SignupButton';
 import LogoutButton from './LogoutButton';
+import { useCurrentUser } from '../context/UseCurrentUserHook';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export default function NavigationBar() {
-  const { user, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
+  const { currentUser } = useCurrentUser();
+  const userId = currentUser?.id;
 
   return (
     <nav className="navigation-bar">
@@ -14,10 +17,10 @@ export default function NavigationBar() {
         <Link to="/">Home</Link>
       </div>
       <div className="navbar-item">
-        <Link to={`/users/${user?.userId}/exercises`}>Exercises</Link>
+        <Link to={`/users/${userId}/exercises`}>Exercises</Link>
       </div>
       <div className="navbar-item">
-        <Link to={`/users/${user?.userId}/routines`}>Routines</Link>
+        <Link to={`/users/${userId}/routines`}>Routines</Link>
       </div>
       {!isAuthenticated && (
         <div className="navbar-item">

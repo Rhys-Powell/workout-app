@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { deleteData, getData, postData } from '../DataService';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import DataService from '../DataService';
 import { Routine } from '../types/Routine';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
+import { useAuth } from '../context/UseAuthHook';
+import { useCurrentUser } from '../context/UseCurrentUserHook';
 
 const typedErrors: Errors = errors;
 
@@ -12,16 +14,17 @@ export default function Routines() {
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const [error, setError] = useState(false);
-  const { userId } = useParams();
-
-  // Calling useParams() creates a new object every time the component is rendered. If the userId param is declared a dependency of the useEffect below and not made a ref, even if the value of userId doesn't change, the new object returned by useParams()is still seen as a change which will trigger the useEffect.
-  const userIdRef = useRef<string | undefined>();
-  userIdRef.current = userId;
+  // Calling useCurrentUser() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()is still seen as a change which will trigger the useEffect in an infinite loop.
+  const { currentUser } = useCurrentUser();
+  const userId = currentUser?.id; 
+  const userIdRef = useRef<string | undefined>(userId?.toString()); 
+  const { token } = useAuth();
+  const dataService = useMemo(() => DataService(token), [token]);
 
   useEffect(() => {
     async function getRoutines() {
       try {
-        const data: Routine[] = await getData('users/' + userIdRef.current + '/routines');
+        const data: Routine[] = await dataService.getData('users/' + userIdRef.current + '/routines');
         setError(false);
         return data;
       } catch (error) {
@@ -35,13 +38,13 @@ export default function Routines() {
     }
 
     getRoutines().then((value) => setRoutines(value ?? []));
-  }, []);
+  }, [dataService]);
 
   async function createRoutine() {
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await postData('users/' + userId + '/routines', { userId: userId, name: input.name });
+        const response = await dataService.postData('users/' + userId + '/routines', { userId: userId, name: input.name });
         setRoutines((prevRoutines) => [...prevRoutines, response]);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -60,7 +63,7 @@ export default function Routines() {
   async function deleteRoutine(routineId: number) {
     if (userId != null) {
       try {
-        await deleteData('users/' + userId + '/routines/' + routineId);
+        await dataService.deleteData('users/' + userId + '/routines/' + routineId);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
           console.error('Failed to fetch data:', error);

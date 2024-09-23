@@ -24,8 +24,7 @@ public static class ExerciseEndpoints
                 .ToListAsync();
 
             return Results.Ok(exercises);
-        })
-        .RequireAuthorization("all");
+        }).RequireAuthorization();
 
         // GET api/users/{userId}/exercises/{exerciseId}
         group.MapGet("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
@@ -37,7 +36,7 @@ public static class ExerciseEndpoints
             return exercise is null ? Results.NotFound() : Results.Ok(exercise.ToDto());
         })
             .WithName(GetExerciseEndpointName)
-            .RequireAuthorization("all");
+            .RequireAuthorization();
 
         // POST api/users/{userId}/exercises
         group.MapPost("/", async (int userId, ExerciseDto newExercise, WorkoutContext dbContext) =>
@@ -48,7 +47,7 @@ public static class ExerciseEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.CreatedAtRoute(GetExerciseEndpointName, new { userId, exerciseId = exercise.Id }, exercise.ToDto());
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         //PUT api/users/{userId}/exercises/{exerciseId}
         group.MapPut("/{exerciseId}", async (int userId, int exerciseId, ExerciseDto updatedExercise, WorkoutContext dbContext) =>
@@ -66,7 +65,7 @@ public static class ExerciseEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         // DELETE api/users/{userId}/exercises/{exerciseId}
         group.MapDelete("/{exerciseId}", async (int userId, int exerciseId, WorkoutContext dbContext) =>
@@ -76,7 +75,7 @@ public static class ExerciseEndpoints
                 .ExecuteDeleteAsync();
 
             return Results.NoContent();
-        }).RequireAuthorization("all");
+        }).RequireAuthorization();
 
         return group;
     }

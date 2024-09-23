@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -34,38 +32,37 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins("http://localhost:5173", "https://rhys-powell.github.io", "https://main--workout-app-rwp.netlify.app", "https://workout-app-rwp.netlify.app")
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
         });
 });
 
-var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
+var domain = $"https://{builder.Configuration["Auth0:Domain"]}";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
-    options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+    options.Authority = domain;
     options.Audience = builder.Configuration["Auth0:Audience"];
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        NameClaimType = ClaimTypes.NameIdentifier
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
     };
 });
 
 builder.Services
   .AddAuthorization(options =>
   {
-      options.AddPolicy(
-        "all",
-        policy => policy.Requirements.Add(
-          new HasScopeRequirement("all", domain)
-        )
-      );
+      options.AddPolicy("RequireAuthenticatedUser", policy =>
+            policy.RequireAuthenticatedUser());
   });
-
-builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
 
 var app = builder.Build();
 
-app.UseAuthorization();
+app.UseCors("AllowReactApp");
+app.UseAuthentication();
 app.UseAuthorization();
 
 if (app.Environment.IsProduction())
@@ -93,12 +90,10 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseCors("AllowReactApp");
 app.MapExerciseEndpoints();
 app.MapUserEndpoints();
 app.MapRoutineEndpoints();
 app.MapRoutineExercisesEndpoints();
-app.MapAuthenticationEndpoints();
 
 await app.MigrateDbAsync();
 
