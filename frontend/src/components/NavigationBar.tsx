@@ -17,6 +17,9 @@ export default function NavigationBar() {
         <Link to="/">Home</Link>
       </div>
       <div className="navbar-item">
+        <Link to="/profile">Profile</Link>
+      </div>
+      <div className="navbar-item">
         <Link to={`/users/${userId}/exercises`}>Exercises</Link>
       </div>
       <div className="navbar-item">

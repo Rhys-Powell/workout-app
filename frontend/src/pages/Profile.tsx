@@ -8,22 +8,24 @@ export default function Profile() {
   const { isLoading, user: auth0user } = useAuth0();
   const userContext = useCurrentUser();
   const auth0id = auth0user?.sub; 
-  const { updateCurrentUser } = useCurrentUser() ?? {};
+  const { updateCurrentUser, currentUser } = useCurrentUser() ?? {};
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/users/auth/${auth0id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    .then(response => response.json())
-    .then((fetchedUser) => {
-      if (updateCurrentUser) {
-        updateCurrentUser(fetchedUser);
-      }
-    });
-  }, [isLoading, auth0id, updateCurrentUser]);
+    if (!currentUser) {
+      fetch(`${API_BASE_URL}/api/users/auth/${auth0id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then((fetchedUser) => {
+        if (updateCurrentUser) {
+          updateCurrentUser(fetchedUser);
+        }
+      });
+    }
+  }, [isLoading, auth0id, updateCurrentUser, currentUser]);
 
   if (isLoading || !userContext) {
     if (!userContext) {
