@@ -25,11 +25,11 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-return (
-  <UserContext.Provider value={{ currentUser, updateCurrentUser }}>
-    {children}
-  </UserContext.Provider>
-)
+  return (
+    <UserContext.Provider value={{ currentUser, updateCurrentUser }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
 export { UserProvider, UserContext}
