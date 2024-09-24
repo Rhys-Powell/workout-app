@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
-import './Stopwatch.css';
+import './Stopwatch.scoped.css';
 
 const maxSecs = 5999;
 

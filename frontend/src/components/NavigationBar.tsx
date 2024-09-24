@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import './NavigationBar.css';
+import './NavigationBar.scoped.css';
 import LoginButton from './LoginButton';
 import SignupButton from './SignupButton';
 import LogoutButton from './LogoutButton';

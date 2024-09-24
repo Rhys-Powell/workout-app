@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip } from './Tooltip';
+import './SignupForm.scoped.css';
+import tooltip from '../../metadata/tooltips.json';
 
 const SignupForm = () => {
   const [email, setEmail] = useState('');
@@ -23,8 +26,8 @@ const SignupForm = () => {
           client_id: import.meta.env.VITE_AUTH0_CLIENT_ID,
           email,
           password,
-          connection: 'Username-Password-Authentication', // Database connection
-          user_metadata: { name }, // Add extra fields here
+          connection: 'Username-Password-Authentication',
+          user_metadata: { name }, 
         }),
       });
 
@@ -47,16 +50,19 @@ const SignupForm = () => {
         Email:
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </label>
-      <label>
-        Password:
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
+      <div className="input-wrapper">
+        <label className="has-tooltip" >
+          Password:
+          <input  type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label>
+        <Tooltip text={tooltip.PASSWORD_TOOLTIP} />
+      </div>
       <label>
         Name:
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
       </label>
       <button type="submit">Sign Up</button>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
     </form>
   );
 };

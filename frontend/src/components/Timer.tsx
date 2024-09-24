@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Countdown from './Countdown';
 import Stopwatch from './Stopwatch';
-import './Timer.css';
+import './Timer.scoped.css';
 
 export default function Timer() {
   const [mode, setMode] = useState('countDown');

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlay, faPlus, faStop } from '@fortawesome/free-solid-svg-icons';
-import './Countdown.css';
+import './Countdown.scoped.css';
 import SetTimer from './SetTimer';
 
 const defaultStartingCount = 120;
