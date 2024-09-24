@@ -2,7 +2,7 @@ import { useState, ReactNode } from "react";
 
 interface ModalProps {
     children: ReactNode;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 function Modal(props: ModalProps) {
@@ -10,7 +10,7 @@ function Modal(props: ModalProps) {
   
     const handleClose = () => {
       setIsOpen(false);
-      props.onClose();
+      props.onClose && props.onClose();
     };
   
     return (
