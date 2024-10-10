@@ -118,6 +118,13 @@ app.MapRoutineExercisesEndpoints();
 
 await app.MigrateDbAsync();
 
+// Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<WorkoutContext>();
+    await SeedData.SeedDatabaseAsync(context);
+}
+
 // Test the database connection
 using (var connection = new MySqlConnection(connectionString))
 {

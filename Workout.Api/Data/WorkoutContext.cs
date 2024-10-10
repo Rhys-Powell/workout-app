@@ -6,7 +6,6 @@ namespace Workout.Api.Data;
 public class WorkoutContext(DbContextOptions<WorkoutContext> options)
     : DbContext(options)
 {
-
     public DbSet<Routine> Routines => Set<Routine>();
     public DbSet<Exercise> Exercises => Set<Exercise>();
     public DbSet<User> Users => Set<User>();

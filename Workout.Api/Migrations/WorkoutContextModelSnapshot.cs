@@ -99,8 +99,9 @@ namespace Workout.Api.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Auth0Id")
-                        .HasColumnType("int");
+                    b.Property<string>("Auth0Id")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .IsRequired()
