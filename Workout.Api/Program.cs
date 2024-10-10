@@ -44,13 +44,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 {
     options.Authority = domain;
     options.Audience = builder.Configuration["Auth0:Audience"];
-    options.TokenValidationParameters = new TokenValidationParameters
+
+    if (!builder.Environment.IsDevelopment())
     {
-        ValidateAudience = true,
-        ValidateIssuer = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-    };
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+        };
+    }
 
     options.Events = new JwtBearerEvents
     {
@@ -62,8 +66,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             if (env.IsDevelopment())
             {
                 // Allow the mock token to pass through in dev
-                if (token == "mock-token")
+                if (token == "api-test-token")
                 {
+                    var claims = new[] { new Claim(ClaimTypes.Name, "apiTestUser") };
+                    var identity = new ClaimsIdentity(claims, "apiTesting");
+                    context.Principal = new ClaimsPrincipal(identity);
                     context.Success();
                     return Task.CompletedTask;
                 }
