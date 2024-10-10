@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
@@ -49,6 +50,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuer = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var env = context.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            var token = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+
+            if (env.IsDevelopment())
+            {
+                // Allow the mock token to pass through in dev
+                if (token == "mock-token")
+                {
+                    context.Success();
+                    return Task.CompletedTask;
+                }
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
