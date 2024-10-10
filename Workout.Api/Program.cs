@@ -147,5 +147,3 @@ using (var connection = new MySqlConnection(connectionString))
 }
 
 app.Run();
-
-//Test of deployment trigger
