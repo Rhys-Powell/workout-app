@@ -9,7 +9,13 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/Workout.Api/Workout.Api.csproj"
+        },
+        {
+            "name": "Frontend Debug on Chrome",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend"
         }
-
     ]
 }
