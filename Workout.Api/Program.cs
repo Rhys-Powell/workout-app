@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
@@ -21,9 +22,15 @@ var password = builder.Configuration["MYSQL_ROOT_PASSWORD"];
 var connectionString = $"Server={server};Port={port};Database={database};User={user};Password={password};";
 
 builder.Services.AddDbContext<WorkoutContext>(
-            dbContextOptions => dbContextOptions
-                .UseMySql(connectionString, serverVersion)
-        );
+    dbContextOptions => dbContextOptions
+        .UseMySql(connectionString, serverVersion)
+);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 builder.Services.AddCors(options =>
 {
