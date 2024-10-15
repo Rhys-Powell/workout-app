@@ -9,6 +9,6 @@ The app is a workout app where a user can CRUD their own exercises, routines, an
 Major work still to be done:
 - The ability to start a workout and then record your progress through that workout in terms of sets and reps completed for each exercise.
 - This only has boilerplate React + Vite project styling so doesn't look great. Better styling will be added further down the track after I've got the functionality I want. Also this is a desktop app project so please view on a desktop. I haven't checked for mobile responsiveness.
-- Unit testing.
+- Testing (API, unit testing, may also add some end-to-end automated tests)
 
-The app is already deployed to https://workout-app-rwp.netlify.app and can be interacted with there.
+The app is already deployed to https://workout-app-rwp.netlify.app and can be interacted with there. If you don't want to register with your real email, feel free to use a fake one as email verification is not required to log in.
