@@ -35,7 +35,7 @@ public static class RoutineEndpoints
             return routine is null ? Results.NotFound() : Results.Ok(routine.ToDto());
         })
             .WithName(GetRoutineEndpointName)
-            .RequireAuthorization("all");
+            .RequireAuthorization();
 
         // POST api/users/{userId}/routines
         group.MapPost("/", async (int userId, RoutineDto newRoutine, WorkoutContext dbContext) =>

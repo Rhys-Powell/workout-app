@@ -67,12 +67,10 @@ export default function Routine() {
 
   async function addRoutineExercise(selectedId: number) {
     if (userIdRef.current != null && selectedId > -1) {
+      const exerciseId: string = selectedId.toString();
       try {
-        const response = await dataService.postDataWithQueryString(
-          'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises',
-          {
-            exerciseId: selectedId.toString(),
-          },
+        const response = await dataService.postData(
+          'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises', { 'exerciseId': exerciseId }
         );
         setRoutineExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {

@@ -1,12 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const DataService = (token: string | null) => {
-  const apiRequest: (endpoint: string, params?: { [key: string]: string; }, options?: RequestInit) => Promise<Response> = async (endpoint, params = {}, options = {}) => {
+  const apiRequest = async (endpoint: string, params: { [key: string]: string } = {}, options: RequestInit = {}) => {
   try {
-    
     const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
     Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-
     options.headers = {
       ...options.headers,
       Authorization: `Bearer ${token}`,
@@ -19,12 +17,14 @@ const DataService = (token: string | null) => {
   }
 };
 
-  const getData = async (endpoint: string, params: { [key: string]: string } = {}) => {
-    const response = await apiRequest(endpoint, params);
+  const getData = async (endpoint: string, params: { [key: string]: string} = {}) => {
+    const response = await apiRequest(endpoint, params, {
+      method: 'GET',
+    });
     return response.json();
   };
 
-  const postData = async (endpoint: string, data: object,  params: { [key: string]: string } = {}) => {
+  const postData = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
     const response = await apiRequest(endpoint, params, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -45,9 +45,13 @@ const DataService = (token: string | null) => {
     return response.json();
   };
 
-  const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}) => {
+  const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
     const response = await apiRequest(endpoint, params, {
       method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
     return response.json();
   };
