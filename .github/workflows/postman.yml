@@ -1,17 +1,42 @@
-name: Automated API tests using Postman CLI
+name: Automated API tests using Newman CLI
 
-on: push
+on:
+  push:
+    branches:
+      - master
+    paths:   
+    - 'Workout.Api/**/*'
+
+services:
+  api:
+    image: Workout.Api/Dockerfile:latest  
+    ports:
+      - 8080:8080
+    options: >  # Pass environment variable to set "development" mode
+      --env ASPNETCORE_ENVIRONMENT=Development
+      --health-cmd="curl http://localhost:8080/health || exit 1"
+      --health-interval=10s
+      --health-timeout=5s
+      --health-retries=5
 
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
       - uses: actions/checkout@v4
-      - name: Install Postman CLI
-        run: |
-          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-      - name: Login to Postman CLI
-        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
-      - name: Run API tests
-        run: |
-          postman collection run "19177718-1bec0609-fe1e-4ea1-83b0-9aec5143661e" -e "19177718-4ae20fd8-6b7f-426a-a960-f516972d3b9d"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Newman API tests
+        run: >
+          newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json 
+          --env-var "access_token_dev=ACCESS_TOKEN_DEV"
+          --environment postman/"Local development".postman_environment.json
+        timeout-minutes: 10
