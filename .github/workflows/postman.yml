@@ -46,6 +46,12 @@ jobs:
             -e ASPNETCORE_ENVIRONMENT=Development \
             --name workout-api-container workout-api:latest
 
+      - name: Wait for API to be ready
+        run: |
+          for i in {1..10}; do
+            curl -f http://localhost:8080/api/health && break || sleep 5
+          done
+
       - name: Install Newman
         run: npm install -g newman
 
