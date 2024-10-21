@@ -129,6 +129,7 @@ app.MapExerciseEndpoints();
 app.MapUserEndpoints();
 app.MapRoutineEndpoints();
 app.MapRoutineExercisesEndpoints();
+app.MapHealthEndpoints();
 
 await app.MigrateDbAsync();
 
