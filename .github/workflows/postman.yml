@@ -22,16 +22,16 @@ jobs:
             --health-timeout=5s
             --health-retries=3
     
-    api:
-      image: Workout.Api/Dockerfile:latest  
-      ports:
-        - 8080:8080
-      options: >  
-        --env ASPNETCORE_ENVIRONMENT=Development
-        --health-cmd="curl http://localhost:8080/api/health || exit 1"
-        --health-interval=10s
-        --health-timeout=5s
-        --health-retries=5
+      api:
+        image: Workout.Api/Dockerfile:latest  
+        ports:
+          - 8080:8080
+        options: >  
+          --env ASPNETCORE_ENVIRONMENT=Development
+          --health-cmd="curl http://localhost:8080/api/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout repository
