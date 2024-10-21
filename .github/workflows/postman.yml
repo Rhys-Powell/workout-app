@@ -23,21 +23,20 @@ jobs:
       mysql:
         image: mysql:8.0.39 
         ports:
-          - ${{ env.DB_PORT }}:3306
+          - ${{ secrets.DB_PORT }}:3306
         options: >-
             --health-cmd="mysqladmin ping --silent"
             --health-interval=10s
             --health-timeout=5s
             --health-retries=3
-        health-checks: always  
     
     api:
       image: Workout.Api/Dockerfile:latest  
       ports:
-        - 8080:8080
+        - ${{secrets.$API_PORT }}:8080
       options: >  
         --env ASPNETCORE_ENVIRONMENT=Development
-        --health-cmd="curl http://localhost:${{ env.API_PORT }}/api/health || exit 1"
+        --health-cmd="curl http://localhost:${{ secrets.API_PORT }}/api/health || exit 1"
         --health-interval=10s
         --health-timeout=5s
         --health-retries=5
