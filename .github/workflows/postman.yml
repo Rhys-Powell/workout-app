@@ -23,7 +23,7 @@ jobs:
             --health-retries=3
     
       api:
-        image: workout.api:latest  
+        image: Dockerfile:latest  
         ports:
           - 8080:8080
         options: >  
