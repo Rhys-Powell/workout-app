@@ -48,9 +48,25 @@ jobs:
 
       - name: Wait for API to be ready
         run: |
-          for i in {1..10}; do
-            curl -f http://localhost:8080/api/health && break || sleep 5
+          sleep 30  # Initial wait for 30 seconds
+          for i in {1..6}; do  # Try up to 6 times (total 1 minute)
+            echo "Attempt $((i))..."
+            if curl -f http://localhost:8080/api/health; then
+              echo "API is ready!"
+              break
+            else
+              echo "API is not ready. Waiting for $((2**i)) seconds before retrying..."
+              sleep $((2**i))  # Exponential backoff: 2^i seconds
+            fi
           done
+
+      - name: Check API readiness
+        run: |
+          # Final check to confirm API readiness
+          if ! curl -f http://localhost:8080/api/health; then
+            echo "API is still not ready after retries."
+            exit 1  # Fail the job if the API is not ready
+          fi
 
       - name: Install Newman
         run: npm install -g newman
