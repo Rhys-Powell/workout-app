@@ -23,11 +23,7 @@
                   "    pm.collectionVariables.set(\"access_token_prod\", prodAccessToken)\r",
                   "};\r",
                   "\r",
-                  "if (data.status === \"success\") {\r",
-                  "    pm.execution.setNextRequest(\"Get health\");\r",
-                  "} else {\r",
-                  "    pm.execution.setNextRequest(null);\r",
-                  "}; "
+                  "pm.execution.setNextRequest(\"Get health\");\r"
                 ],
                 "type": "text/javascript",
                 "packages": {}
