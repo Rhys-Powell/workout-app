@@ -48,7 +48,7 @@ export default function Exercises() {
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData('users/' + userId.toString() + '/exercises', { userId: userId.toString(), name: input.name });
+        const response = await dataService.postData('users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
         setExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
