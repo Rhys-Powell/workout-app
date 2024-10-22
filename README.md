@@ -3,7 +3,8 @@ This is a learning project implementing:
 - a MySql DB;
 - a React & Typescript front-end with Vite
 - Auth0 2.0 authentication
-- API and database have been deployed to separate Fly.io apps, and the frontend to Netlify.
+- API and database have been deployed to separate Fly.io apps, and the front-end to Netlify
+- Continuous deployment of API via GitHub Actions workflow
 
 The app is a workout app where a user can CRUD their own exercises, routines, and then populate the routines with exercises. You can drag and drop to rearrange the order of exercises within a routine. This order is not currently saved but I will add this feature. Other user data is persisted in a MySql database though.
 
