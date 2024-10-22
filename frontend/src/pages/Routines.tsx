@@ -44,7 +44,7 @@ export default function Routines() {
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData('users/' + userId + '/routines', { userId: userId, name: input.name });
+        const response = await dataService.postData('users/' + userId.toString() + '/routines', { userId: userId.toString(), name: input.name });
         setRoutines((prevRoutines) => [...prevRoutines, response]);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
