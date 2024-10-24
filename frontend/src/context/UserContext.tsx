@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { User } from '../types/User';
 
 export interface UserContextType {
@@ -11,18 +11,8 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [ currentUser, setCurrentUser ] = useState<User | null>(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-     }
-    }, []);
-  
   const updateCurrentUser = (newUser: User | null) => {
     setCurrentUser(newUser);
-    if (newUser) {
-      localStorage.setItem('user', JSON.stringify(newUser));
-    }
   }
 
   return (

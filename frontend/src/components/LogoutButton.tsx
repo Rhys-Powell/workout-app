@@ -9,7 +9,6 @@ const LogoutButton = () => {
     logout({
       logoutParams: { returnTo: window.location.origin },
     }).then(() => {
-      localStorage.removeItem("user");
       updateCurrentUser(null);
     }).catch(err => {
       console.error('Logout failed', err);
