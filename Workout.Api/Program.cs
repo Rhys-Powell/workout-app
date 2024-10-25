@@ -156,3 +156,5 @@ using (var connection = new MySqlConnection(connectionString))
 
 app.Run();
 
+//Test wokflow trigger
+
