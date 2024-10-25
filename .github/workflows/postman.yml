@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Check API readiness
         run: |
-          if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" "${{ vars.PROXY_LOCAL_SERVER }}:5257/api/health"; then
+          if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" "${{ vars.PROXY_LOCAL_SERVER }}/api/health"; then
             echo "API is not ready."
             exit 1  # Fail the job if the API is not ready
           fi
@@ -27,7 +27,7 @@ jobs:
           newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json 
           --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}"
           --environment postman/"Local development".postman_environment.json
-          --global-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}:5257"
+          --global-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}"
           --reporters html \
           --reporter-html-export newman/newman-report.html
         timeout-minutes: 10
