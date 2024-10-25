@@ -26,9 +26,9 @@ jobs:
         run: >
           newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json 
           --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}"
-          --environment postman/"Local development".postman_environment.json
+          --environment 'postman/Local development.postman_environment.json'
           --global-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}"
-          --reporters html \
+          --reporters html
           --reporter-html-export newman/newman-report.html
         timeout-minutes: 10
 
