@@ -19,18 +19,23 @@ jobs:
             exit 1  # Fail the job if the API is not ready
           fi
 
+      - name: List files in postman directory
+        run: ls -la postman/
+
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Print working directory
+        run: pwd
+
       - name: Run Newman API tests
-        run: >
-          newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json 
-          --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}"
-          --environment 'postman/Local development.postman_environment.json'
-          --global-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}"
-          --reporters html
+        run: |
+          newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json \
+          --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}" \
+          --environment postman/"Local development.postman_environment.json" \
+          --global-var "base_url=https://***REMOVED***" \
+          --reporters html \
           --reporter-html-export newman/newman-report.html
-        timeout-minutes: 10
 
       - name: Upload HTML Newman report
         uses: actions/upload-artifact@v3
