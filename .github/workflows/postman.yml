@@ -60,7 +60,7 @@ jobs:
           sleep 30  # Initial wait for 30 seconds
           for i in {1..6}; do  # Try up to 6 times (total 1 minute)
             echo "Attempt $((i))..."
-            if curl -f http://localhost:8080/api/health; then
+            if curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" http://localhost:8080/api/health; then
               echo "API is ready!"
               break
             else
@@ -72,7 +72,7 @@ jobs:
       - name: Check API readiness
         run: |
           # Final check to confirm API readiness
-          if ! curl -f http://localhost:8080/api/health; then
+          if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }} "http://localhost:8080/api/health; then
             echo "API is still not ready after retries."
             exit 1  # Fail the job if the API is not ready
           fi
