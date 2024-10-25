@@ -44,10 +44,10 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
             -e ASPNETCORE_ENVIRONMENT=Development \
-            -e DB_SERVER="${{ env.DB_SERVER }}" \
-            -e DB_PORT="${{ env.DB_PORT }}" \
-            -e DB_DATABASE="${{ env.DB_DATABASE }}" \
-            -e DB_USER="${{ env.DB_USER }}" \
+            -e DB_SERVER="${{ vars.DB_SERVER }}" \
+            -e DB_PORT="${{ vars.DB_PORT }}" \
+            -e DB_DATABASE="${{ vars.DB_DATABASE }}" \
+            -e DB_USER="${{ vars.DB_USER }}" \
             -e MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}" \
             --name workout-api-container workout-api:latest
 
