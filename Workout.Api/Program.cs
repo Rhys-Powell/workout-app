@@ -156,3 +156,4 @@ using (var connection = new MySqlConnection(connectionString))
 
 app.Run();
 
+//Test workflow trigger
