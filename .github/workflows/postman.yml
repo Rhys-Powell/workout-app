@@ -44,8 +44,7 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
             -e ASPNETCORE_ENVIRONMENT=Development \
-            -e ASPNETCORE_ENVIRONMENT=Development \
-            -e DB_SERVER="host.docker.internal" \
+            -e DB_SERVER="${{ env.DB_SERVER }}" \
             -e DB_PORT="3306" \
             -e DB_DATABASE="your_database_name" \
             -e DB_USER="root" \
