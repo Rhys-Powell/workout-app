@@ -1158,7 +1158,7 @@
               "    return;\r",
               "} else if (environment.toLowerCase() !== 'production') {\r",
               "    console.log(\"Environment is not production. Setting dev access token.\");\r",
-              "    accessToken = pm.collectionVariables.get(\"access_token_dev\")\r",
+              "    accessToken = pm.collectionVariables.get(\"access_token_dev\") || pm.globals.get(\"access_token_dev\");\r",
               "} else {\r",
               "    console.log(\"Environment is production. Setting prod access token.\");\r",
               "    accessToken = pm.collectionVariables.get(\"access_token_prod\");\r",
