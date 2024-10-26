@@ -23,7 +23,7 @@
 									"    pm.collectionVariables.set(\"access_token_prod\", prodAccessToken)\r",
 									"};\r",
 									"\r",
-									"pm.execution.setNextRequest(\"Get health\");"
+									"// pm.execution.setNextRequest(\"Get health\");"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -76,1073 +76,985 @@
 			"name": "Script to set bearer header based on env",
 			"item": [
 				{
-					"name": "Health",
-					"item": [
-						{
-							"name": "Get health",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"try {\r",
-											"    pm.test(\"Status code is 200\", function () {\r",
-											"        pm.response.to.have.status(200);\r",
-											"    });\r",
-											"    pm.execution.setNextRequest(\"Create user\");\r",
-											"} catch (error) {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"    console.log(error);\r",
-											"};"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/health",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"health"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"auth": {
-						"type": "noauth"
-					},
+					"name": "Get health",
 					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"type": "text/javascript",
-								"packages": {},
-								"exec": [
-									""
-								]
-							}
-						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
-								"packages": {},
 								"exec": [
-									""
-								]
+									"try {\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"    pm.execution.setNextRequest(\"Create user\");\r",
+									"} catch (error) {\r",
+									"    pm.execution.setNextRequest(null);\r",
+									"    console.log(error);\r",
+									"};"
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
-						}
-					]
-				},
-				{
-					"name": "Users",
-					"item": [
-						{
-							"name": "Create user",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful POST request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"})\r",
-											"\r",
-											"pm.environment.set(\"test_user_id\", pm.response.json().id);\r",
-											"pm.execution.setNextRequest(\"Get users\");\r",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Sally Field\",\r\n    \"email\": \"sally@gmail.com\",\r\n    \"auth0Id\": \"testAuth0Id\"\r\n}\r\n",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/users",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get users",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response body is an array\", function () {\r",
-											"    pm.expect(pm.response.json()).to.be.an('array');\r",
-											"});\r",
-											"\r",
-											"if (pm.response.json().length > 0) {\r",
-											"    pm.test(\"First item has valid schema\", function () {\r",
-											"        const firstItem = pm.response.json()[0];\r",
-											"        schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
-											"        // console.log(schema);\r",
-											"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
-											"    });\r",
-											"};\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Get user\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get user",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Create exercise\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete user",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful DELETE request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
-											"});\r",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}"
-									]
-								}
-							},
-							"response": []
 						}
 					],
-					"auth": {
-						"type": "noauth"
-					},
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"type": "text/javascript",
-								"packages": {},
-								"exec": [
-									""
-								]
-							}
+					"request": {
+						"auth": {
+							"type": "noauth"
 						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
-								"packages": {},
 								"exec": [
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"})\r",
+									"\r",
+									"console.log(\"userId\", pm.response.json().id);\r",
+									"pm.environment.set(\"test_user_id\", pm.response.json().id);\r",
+									"pm.execution.setNextRequest(\"Get users\");\r",
 									""
-								]
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
-						}
-					]
-				},
-				{
-					"name": "Exercises",
-					"item": [
-						{
-							"name": "Create exercise",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful POST request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"})\r",
-											"\r",
-											"pm.environment.set(\"test_exercise_id\", pm.response.json().id);\r",
-											"pm.execution.setNextRequest(\"Get exercises\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \r\n    \"userid\": {{test_user_id}},\r\n    \"name\": \"Test exercise\" \r\n}\r\n",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"exercises"
-									]
-								}
-							},
-							"response": []
 						},
-						{
-							"name": "Get exercises",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response body is an array\", function () {\r",
-											"    pm.expect(pm.response.json()).to.be.an('array');\r",
-											"});\r",
-											"\r",
-											"if (pm.response.json().length > 0) {\r",
-											"    pm.test(\"First item has valid schema\", function () {\r",
-											"        const firstItem = pm.response.json()[0];\r",
-											"        schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
-											"        // console.log(schema);\r",
-											"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
-											"    })\r",
-											"}\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Get exercise\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"exercises"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get exercise",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Create routine\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises/{{test_exercise_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"exercises",
-										"{{test_exercise_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete exercise",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful DELETE request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Delete user\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises/{{test_exercise_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"exercises",
-										"{{test_exercise_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"auth": {
-						"type": "noauth"
-					},
-					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
-								"packages": {},
 								"exec": [
 									""
-								]
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Sally Field\",\r\n    \"email\": \"sally@gmail.com\",\r\n    \"auth0Id\": \"testAuth0Id\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
 							}
 						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get users",
+					"event": [
 						{
 							"listen": "test",
 							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body is an array\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"First item has valid schema\", function () {\r",
+									"        const firstItem = pm.response.json()[0];\r",
+									"        schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
+									"        // console.log(schema);\r",
+									"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Get user\");"
+								],
 								"type": "text/javascript",
-								"packages": {},
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
 								"exec": [
 									""
-								]
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
-					]
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"name": "Routines",
-					"item": [
+					"name": "Get user",
+					"event": [
 						{
-							"name": "Create routine",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful POST request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"test_routine_id\", pm.response.json().id);\r",
-											"pm.execution.setNextRequest(\"Get routines\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \r\n    \"userid\": {{test_user_id}},\r\n    \"name\": \"Test routine\" \r\n}\r\n",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get routines",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response body is an array\", function () {\r",
-											"    pm.expect(pm.response.json()).to.be.an('array');\r",
-											"});\r",
-											"\r",
-											"if (pm.response.json().length > 0) {\r",
-											"    pm.test(\"First item has valid schema\", function () {\r",
-											"        const firstItem = pm.response.json()[0];\r",
-											"        schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
-											"        // console.log(schema);\r",
-											"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
-											"    });\r",
-											"};\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Get routine\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get routine",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Add exercise to routine\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete routine",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful DELETE request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Delete exercise\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}"
-									]
-								}
-							},
-							"response": []
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"user_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Create exercise\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					]
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"name": "RoutineExercises",
-					"item": [
+					"name": "Delete user",
+					"event": [
 						{
-							"name": "Add exercise to routine",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful POST request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response has valid schema\", function () {\r",
-											"    schema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema\"));\r",
-											"    // console.log(schema);\r",
-											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"routineExercise_id\", pm.response.json().id);\r",
-											"pm.execution.setNextRequest(\"Get exercises in routine with details\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises?exerciseId={{test_exercise_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}",
-										"exercises"
-									],
-									"query": [
-										{
-											"key": "exerciseId",
-											"value": "{{test_exercise_id}}"
-										}
-									]
-								}
-							},
-							"response": []
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(null);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						},
 						{
-							"name": "Get exercises in routine with details",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response body is an array\", function () {\r",
-											"    pm.expect(pm.response.json()).to.be.an('array');\r",
-											"});\r",
-											"\r",
-											"if (pm.response.json().length > 0) {\r",
-											"    pm.test(\"First item has valid schema\", function () {\r",
-											"        const firstItem = pm.response.json()[0];\r",
-											"        let mainSchema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema_with_details\"));\r",
-											"        let exerciseSchema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
-											"        // Dynamically insert the exercise schema into the main schema\r",
-											"        mainSchema.properties[\"exercise\"] = exerciseSchema;\r",
-											"        // console.log(mainSchema);\r",
-											"        pm.expect(firstItem).to.have.jsonSchema(mainSchema);\r",
-											"    });\r",
-											"};\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Get exercises in routine without details\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises/?includeDetails=true",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}",
-										"exercises",
-										""
-									],
-									"query": [
-										{
-											"key": "includeDetails",
-											"value": "true"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get exercises in routine without details",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response is valid JSON\", function () {\r",
-											"    pm.response.to.have.jsonBody();\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response body is an array\", function () {\r",
-											"    pm.expect(pm.response.json()).to.be.an('array');\r",
-											"});\r",
-											"\r",
-											"if (pm.response.json().length > 0) {\r",
-											"    pm.test(\"First item has valid schema\", function () {\r",
-											"        const firstItem = pm.response.json()[0];\r",
-											"        schema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema\"));\r",
-											"        // console.log(schema);\r",
-											"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
-											"    });\r",
-											"};\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Remove exercise from routine\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises?includeDetails=false",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}",
-										"exercises"
-									],
-									"query": [
-										{
-											"key": "includeDetails",
-											"value": "false"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Remove exercise from routine",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Successful DELETE request\", function () {\r",
-											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
-											"});\r",
-											"\r",
-											"pm.execution.setNextRequest(\"Delete routine\");"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises/{{test_exercise_id}}",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"users",
-										"{{test_user_id}}",
-										"routines",
-										"{{test_routine_id}}",
-										"exercises",
-										"{{test_exercise_id}}"
-									]
-								}
-							},
-							"response": []
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create exercise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"})\r",
+									"\r",
+									"pm.environment.set(\"test_exercise_id\", pm.response.json().id);\r",
+									"pm.execution.setNextRequest(\"Get exercises\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"userid\": {{test_user_id}},\r\n    \"name\": \"Test exercise\" \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get exercises",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body is an array\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"First item has valid schema\", function () {\r",
+									"        const firstItem = pm.response.json()[0];\r",
+									"        schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
+									"        // console.log(schema);\r",
+									"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
+									"    })\r",
+									"}\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Get exercise\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get exercise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Create routine\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises/{{test_exercise_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"exercises",
+								"{{test_exercise_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete exercise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Delete user\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/exercises/{{test_exercise_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"exercises",
+								"{{test_exercise_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create routine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"test_routine_id\", pm.response.json().id);\r",
+									"pm.execution.setNextRequest(\"Get routines\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"userid\": {{test_user_id}},\r\n    \"name\": \"Test routine\" \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get routines",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body is an array\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"First item has valid schema\", function () {\r",
+									"        const firstItem = pm.response.json()[0];\r",
+									"        schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
+									"        // console.log(schema);\r",
+									"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Get routine\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get routine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    schema = JSON.parse(pm.collectionVariables.get(\"routine_schema\"));\r",
+									"    // console.log(schema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Add exercise to routine\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete routine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Delete exercise\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add exercise to routine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid schema\", function () {\r",
+									"    let mainSchema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema_with_details\"));\r",
+									"    let exerciseSchema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
+									"    // Dynamically insert the exercise schema into the main schema\r",
+									"    mainSchema.properties[\"exercise\"] = exerciseSchema;\r",
+									"    // console.log(mainSchema);\r",
+									"    pm.expect(pm.response.json()).to.have.jsonSchema(mainSchema);\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"routineExercise_id\", pm.response.json().id);\r",
+									"pm.execution.setNextRequest(\"Get exercises in routine with details\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises?exerciseId={{test_exercise_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}",
+								"exercises"
+							],
+							"query": [
+								{
+									"key": "exerciseId",
+									"value": "{{test_exercise_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get exercises in routine with details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body is an array\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"First item has valid schema\", function () {\r",
+									"        const firstItem = pm.response.json()[0];\r",
+									"        let mainSchema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema_with_details\"));\r",
+									"        let exerciseSchema = JSON.parse(pm.collectionVariables.get(\"exercise_schema\"));\r",
+									"        // Dynamically insert the exercise schema into the main schema\r",
+									"        mainSchema.properties[\"exercise\"] = exerciseSchema;\r",
+									"        // console.log(mainSchema);\r",
+									"        pm.expect(firstItem).to.have.jsonSchema(mainSchema);\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Get exercises in routine without details\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises/?includeDetails=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}",
+								"exercises",
+								""
+							],
+							"query": [
+								{
+									"key": "includeDetails",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get exercises in routine without details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.response.to.have.jsonBody();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body is an array\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"First item has valid schema\", function () {\r",
+									"        const firstItem = pm.response.json()[0];\r",
+									"        schema = JSON.parse(pm.collectionVariables.get(\"routine_exercise_schema\"));\r",
+									"        // console.log(schema);\r",
+									"        pm.expect(firstItem).to.have.jsonSchema(schema);\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Remove exercise from routine\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises?includeDetails=false",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}",
+								"exercises"
+							],
+							"query": [
+								{
+									"key": "includeDetails",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove exercise from routine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
+									"});\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Delete routine\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_user_id}}/routines/{{test_routine_id}}/exercises/{{test_exercise_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_user_id}}",
+								"routines",
+								"{{test_routine_id}}",
+								"exercises",
+								"{{test_exercise_id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "The pre-request script in this folder runs before every descendent request automatically and sets the correct bearer token header value based on what environment has been selected to be tested.\n\nFor this to work for the production environment, make sure you've obtained an access token and set it as a collection variable by following the instructions in 'Overview' tab of 'Workout app' collection folder.",
@@ -1153,31 +1065,27 @@
 						"type": "text/javascript",
 						"packages": {},
 						"exec": [
-							"let prevEnvironment = pm.variables.get(\"prevEnvironment\").toLowerCase();\r",
-							"let currEnvironment = pm.environment.name.toLowerCase();\r",
-							"\r",
-							"if (!currEnvironment) {\r",
-							"    console.log(\"No environment selected. Exiting script.\");\r",
-							"    return;\r",
-							"} else if (currEnvironment == prevEnvironment) {\r",
-							"    return;\r",
-							"} else {\r",
+							"{\r",
+							"    let currEnvironment = pm.environment.name.toLowerCase();\r",
 							"    let accessToken;\r",
-							"    pm.variables.set(\"prevEnvironment\", currEnvironment);\r",
-							"    \r",
-							"    if (currEnvironment !== 'production') {\r",
-							"        console.log(\"Environment is not production. Setting dev access token.\");\r",
-							"        accessToken = pm.collectionVariables.get(\"access_token_dev\") || pm.globals.get(\"access_token_dev\");\r",
+							"\r",
+							"    if (!currEnvironment) {\r",
+							"        console.log(\"No environment selected. Exiting script.\");\r",
+							"        return;\r",
 							"    } else {\r",
-							"        console.log(\"Environment is production. Setting prod access token.\");\r",
-							"        accessToken = pm.collectionVariables.get(\"access_token_prod\");\r",
-							"    }\r",
+							"        if (currEnvironment !== 'production') {\r",
+							"            console.log(\"Environment is not production. Setting dev access token.\");\r",
+							"            accessToken = pm.collectionVariables.get(\"access_token_dev\") || pm.globals.get(\"access_token_dev\");\r",
+							"        } else {\r",
+							"            console.log(\"Environment is production. Setting prod access token.\");\r",
+							"            accessToken = pm.collectionVariables.get(\"access_token_prod\");\r",
+							"        }\r",
+							"    };\r",
 							"    pm.request.headers.add({\r",
-							"            key: 'Authorization',\r",
-							"            value: `Bearer ${accessToken}`\r",
+							"        key: 'Authorization',\r",
+							"        value: `Bearer ${accessToken}`\r",
 							"    });\r",
-							"};\r",
-							""
+							"}"
 						]
 					}
 				},
