@@ -34,13 +34,20 @@ jobs:
 
       - name: Run Newman API tests
         run: |
+          echo "Running Newman tests..."
           newman run postman/Workout_app.postman_collection.json \
-          --env-var "access_token_dev=api-test-token" \
-          --environment postman/Local_development.postman_environment.json \
-          --global-var "base_url=https://***REMOVED***" \
-          --reporters html \
-          --reporter-html-export newman/newman-report.html \
-          --verbose
+            --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}" \
+            --environment postman/Local_development.postman_environment.json \
+            --global-var "base_url=https://***REMOVED***" \
+            --reporters cli,html \
+            --reporter-html-export newman/newman-report.html \
+            --verbose > newman_output.log 2>&1 || {
+              echo "Newman tests failed. Output:"
+              cat newman_output.log
+              exit 1
+            }
+          echo "Newman tests completed successfully."
+
 
       - name: Upload HTML Newman report
         uses: actions/upload-artifact@v3
