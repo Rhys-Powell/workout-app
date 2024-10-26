@@ -85,18 +85,15 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"if (pm.response.status === \"success\") {\r",
+											"try {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    });\r",
 											"    pm.execution.setNextRequest(\"Create user\");\r",
-											"} else {\r",
+											"} catch (error) {\r",
 											"    pm.execution.setNextRequest(null);\r",
-											"}; \r",
-											"\r",
-											"\r",
-											""
+											"    console.log(error);\r",
+											"};"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -174,12 +171,7 @@
 											"})\r",
 											"\r",
 											"pm.environment.set(\"test_user_id\", pm.response.json().id);\r",
-											"\r",
-											"if (data.status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get users\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
+											"pm.execution.setNextRequest(\"Get users\");\r",
 											""
 										],
 										"type": "text/javascript",
@@ -253,11 +245,7 @@
 											"    });\r",
 											"};\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get user\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};"
+											"pm.execution.setNextRequest(\"Get user\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -314,11 +302,7 @@
 											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Create exercise\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};"
+											"pm.execution.setNextRequest(\"Create exercise\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -434,13 +418,7 @@
 											"})\r",
 											"\r",
 											"pm.environment.set(\"test_exercise_id\", pm.response.json().id);\r",
-											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get exercises\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Get exercises\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -515,11 +493,7 @@
 											"    })\r",
 											"}\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get exercise\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};"
+											"pm.execution.setNextRequest(\"Get exercise\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -578,14 +552,7 @@
 											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Create routine\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											"\r",
-											"\r",
-											""
+											"pm.execution.setNextRequest(\"Create routine\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -625,11 +592,7 @@
 											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.code === 200 || pm.response.code === 202 || pm.response.code === 204) {\r",
-											"    pm.execution.setNextRequest(\"Delete user\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};"
+											"pm.execution.setNextRequest(\"Delete user\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -710,13 +673,7 @@
 											"});\r",
 											"\r",
 											"pm.environment.set(\"test_routine_id\", pm.response.json().id);\r",
-											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get routines\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Get routines\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -791,12 +748,7 @@
 											"    });\r",
 											"};\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get routine\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Get routine\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -855,12 +807,7 @@
 											"    pm.expect(pm.response.json()).to.have.jsonSchema(schema);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Add exercise to routine\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Add exercise to routine\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -900,11 +847,7 @@
 											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.code === 200 || pm.response.code === 202 || pm.response.code === 204) {\r",
-											"    pm.execution.setNextRequest(\"Delete exercise\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};"
+											"pm.execution.setNextRequest(\"Delete exercise\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -960,13 +903,7 @@
 											"});\r",
 											"\r",
 											"pm.environment.set(\"routineExercise_id\", pm.response.json().id);\r",
-											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get exercises in routine with details\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Get exercises in routine with details\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -1052,13 +989,7 @@
 											"    });\r",
 											"};\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Get exercises in routine without details\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											"\r",
-											""
+											"pm.execution.setNextRequest(\"Get exercises in routine without details\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -1133,12 +1064,7 @@
 											"    });\r",
 											"};\r",
 											"\r",
-											"if (pm.response.json().status === \"success\") {\r",
-											"    pm.execution.setNextRequest(\"Remove exercise from routine\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Remove exercise from routine\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -1185,12 +1111,7 @@
 											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);\r",
 											"});\r",
 											"\r",
-											"if (pm.response.code === 200 || pm.response.code === 202 || pm.response.code === 204) {\r",
-											"    pm.execution.setNextRequest(\"Delete routine\");\r",
-											"} else {\r",
-											"    pm.execution.setNextRequest(null);\r",
-											"};\r",
-											""
+											"pm.execution.setNextRequest(\"Delete routine\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
