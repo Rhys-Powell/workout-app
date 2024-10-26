@@ -36,8 +36,6 @@ jobs:
       - name: Run Newman API tests
         run: |
           newman run postman/Workout_app.postman_collection.json \
-          --env-var "access_token_dev=api-test-token" \
-          --environment postman/Local_development.postman_environment.json \
           --global-var "base_url=https://***REMOVED***" \
           --reporters html \
           --reporter-html-export newman/newman-report.html \
