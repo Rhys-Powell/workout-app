@@ -12,6 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
       - name: Check API readiness
         run: |
           if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" "${{ vars.PROXY_LOCAL_SERVER }}/api/health"; then
