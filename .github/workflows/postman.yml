@@ -30,7 +30,6 @@ jobs:
       - name: Install Newman and Reporters
         run: |
           npm install -g newman
-          npm install -g newman-reporter-cli
           npm install -g newman-reporter-html  
 
       - name: Run Newman API tests
