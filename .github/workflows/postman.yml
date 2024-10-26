@@ -35,6 +35,9 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Install reporters
+        run: npm install -g newman-reporter-html  
+
       - name: Run Newman API tests
         run: |
           newman run postman/Workout_app.postman_collection.json \
