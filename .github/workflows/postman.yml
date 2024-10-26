@@ -27,11 +27,6 @@ jobs:
             exit 1  # Fail the job if the API is not ready
           fi
 
-      - name: Print repository structure
-        run: |
-          echo "Repository Structure:"
-          tree -L 2
-
       - name: Install Newman
         run: npm install -g newman
 
@@ -41,11 +36,12 @@ jobs:
       - name: Run Newman API tests
         run: |
           newman run postman/Workout_app.postman_collection.json \
-          --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}" \
+          --env-var "access_token_dev=api-test-token" \
           --environment postman/Local_development.postman_environment.json \
           --global-var "base_url=https://***REMOVED***" \
           --reporters html \
-          --reporter-html-export newman/newman-report.html
+          --reporter-html-export newman/newman-report.html \
+          --verbose
 
       - name: Upload HTML Newman report
         uses: actions/upload-artifact@v3
