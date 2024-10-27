@@ -3,7 +3,7 @@ name: Automated API tests using Newman CLI
 on:
   push:
     branches:
-      - test-branch
+      - main
     paths:   
       - 'Workout.Api/**/*'
 
