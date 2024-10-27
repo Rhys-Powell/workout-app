@@ -3,56 +3,54 @@ name: Automated API tests using Newman CLI
 on:
   push:
     branches:
-      - master
+      - test-branch
     paths:   
-    - 'Workout.Api/**/*'
-
-services:
-  mysql:
-    image: mysql:8.0.39 
-    ports:
-      - ${{ env.DB_PORT }}:3306
-    options: >-
-        --health-cmd="mysqladmin ping --silent"
-        --health-interval=10s
-        --health-timeout=5s
-        --health-retries=3
-    health-checks: always  
-  
-  api:
-    image: Workout.Api/Dockerfile:latest  
-    ports:
-      - 8080:8080
-    options: >  
-      --env ASPNETCORE_ENVIRONMENT=Development
-      --health-cmd="curl http://localhost:${{ env.API_PORT }}/api/health || exit 1"
-      --health-interval=10s
-      --health-timeout=5s
-      --health-retries=5
-
-env:
-  API_PORT: 8080
-  DB_PORT: 3306
+      - 'Workout.Api/**/*'
 
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Check out the repository
+        uses: actions/checkout@v2
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: '18.x'
+          node-version: '18'
 
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Check API readiness
+        run: |
+          if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" "${{ vars.PROXY_LOCAL_SERVER }}/api/health"; then
+            echo "API is not ready."
+            exit 1  # Fail the job if the API is not ready
+          fi
+
+      - name: Install Newman and Reporters
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-html  
 
       - name: Run Newman API tests
-        run: >
-          newman run postman/"Workout app - instructions in 'Overview' tab".postman_collection.json 
-          --env-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}"
-          --environment postman/"Local development".postman_environment.json
-          --global-var "base_url=http://api:${{ env.API_PORT }}"
-        timeout-minutes: 10
+        run: |
+          echo "Running Newman tests..."
+          newman run postman/Workout_app.postman_collection.json \
+            --global-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}" \
+            --environment postman/Local_development.postman_environment.json \
+            --env-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}" \
+            --reporters cli,html \
+            --reporter-html-export newman/newman-report.html \
+            --verbose > newman_output.log 2>&1 || {
+              echo "Newman tests failed. Output:"
+              cat newman_output.log
+              exit 1
+            }
+          echo "Newman tests completed successfully."
+
+
+      - name: Upload HTML Newman report
+        uses: actions/upload-artifact@v3
+        with:
+          name: newman-report-html
+          path: newman/newman-report.html
