@@ -6,7 +6,7 @@ on:
       - main
     paths:   
       - 'Workout.Api/**/*'
-    workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   automated-api-tests:
