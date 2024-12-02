@@ -11,7 +11,9 @@ on:
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
-    
+    env:
+      ACCESS_TOKEN_DEV: ${{ secrets.ACCESS_TOKEN_DEV }}
+      PROXY_LOCAL_SERVER: ${{ vars.PROXY_LOCAL_SERVER }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
@@ -23,7 +25,7 @@ jobs:
 
       - name: Check API readiness
         run: |
-          if ! curl -f -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN_DEV }}" "${{ vars.PROXY_LOCAL_SERVER }}/api/health"; then
+          if ! curl -f -H "Authorization: Bearer ${ACCESS_TOKEN_DEV}" "${PROXY_LOCAL_SERVER}/api/health"; then
             echo "API is not ready."
             exit 1  # Fail the job if the API is not ready
           fi
@@ -37,9 +39,9 @@ jobs:
         run: |
           echo "Running Newman tests..."
           newman run postman/Workout_app.postman_collection.json \
-            --global-var "access_token_dev=${{ secrets.ACCESS_TOKEN_DEV }}" \
+            --global-var "access_token_dev=${ACCESS_TOKEN_DEV}" \
             --environment postman/Local_development.postman_environment.json \
-            --env-var "base_url=${{ vars.PROXY_LOCAL_SERVER }}" \
+            --env-var "base_url=${PROXY_LOCAL_SERVER}" \
             --reporters cli,html \
             --reporter-html-export newman/newman-report.html \
             --verbose > newman_output.log 2>&1 || {
@@ -49,8 +51,19 @@ jobs:
             }
           echo "Newman tests completed successfully."
 
+      - name: Handle Newman HTML Report
+        run: |
+          if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
+            echo "Running in GitHub Actions, uploading artifact..."
+            # Artifact upload is handled in the next step
+          else
+            echo "Running locally with act. Saving report to ./local-newman-reports/"
+            mkdir -p ./local-newman-reports
+            cp newman/newman-report.html ./local-newman-reports/
+          fi
 
       - name: Upload HTML Newman report
+        if: ${{ runner.env.GITHUB_ACTIONS == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: newman-report-html

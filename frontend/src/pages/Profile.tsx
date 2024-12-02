@@ -9,23 +9,27 @@ export default function Profile() {
   const userContext = useCurrentUser();
   const auth0id = auth0user?.sub; 
   const { updateCurrentUser, currentUser } = useCurrentUser() ?? {};
+  const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     if (!currentUser) {
-      fetch(`${API_BASE_URL}/api/users/auth/${auth0id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-      .then(response => response.json())
-      .then((fetchedUser) => {
-        if (updateCurrentUser) {
-          updateCurrentUser(fetchedUser);
-        }
+      getAccessTokenSilently().then((token) => {
+        fetch(`${API_BASE_URL}/api/users/auth/${auth0id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          }
+        })
+        .then(response => response.json())
+        .then((fetchedUser) => {
+          if (updateCurrentUser) {
+            updateCurrentUser(fetchedUser);
+          }
+        });
       });
     }
-  }, [isLoading, auth0id, updateCurrentUser, currentUser]);
+  }, [isLoading, auth0id, updateCurrentUser, currentUser, getAccessTokenSilently]);
 
   if (isLoading || !userContext) {
     if (!userContext) {

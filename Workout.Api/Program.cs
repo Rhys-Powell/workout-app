@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
 using Workout.Api.Data;
 using Workout.Api.Endpoints;
+using Workout.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,16 +53,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     options.Authority = domain;
     options.Audience = builder.Configuration["Auth0:Audience"];
 
-    if (!builder.Environment.IsDevelopment())
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-        };
-    }
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+    };
 
     options.Events = new JwtBearerEvents
     {
@@ -70,17 +68,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             var env = context.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
             var token = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-            if (env.IsDevelopment())
+            // Allow the mock token to pass through in dev
+            if (env.IsDevelopment() && token == "api-test-token")
             {
-                // Allow the mock token to pass through in dev
-                if (token == "api-test-token")
-                {
-                    var claims = new[] { new Claim(ClaimTypes.Name, "apiTestUser") };
-                    var identity = new ClaimsIdentity(claims, "apiTesting");
-                    context.Principal = new ClaimsPrincipal(identity);
-                    context.Success();
-                    return Task.CompletedTask;
-                }
+                var claims = new[] {
+                    new Claim(ClaimTypes.Name, "apiTestUser"),
+                    new Claim("permissions", "all")
+                };
+                var identity = new ClaimsIdentity(claims, "apiTesting");
+                context.Principal = new ClaimsPrincipal(identity);
+                context.Success();
+                return Task.CompletedTask;
             }
             return Task.CompletedTask;
         }
@@ -91,7 +89,9 @@ builder.Services
   .AddAuthorization(options =>
   {
       options.AddPolicy("RequireAuthenticatedUser", policy =>
-            policy.RequireAuthenticatedUser());
+              policy.RequireAuthenticatedUser());
+      options.AddPolicy("RequireAdmin", policy =>
+              policy.RequireClaim("permissions", "all"));
   });
 
 var app = builder.Build();
@@ -99,6 +99,14 @@ var app = builder.Build();
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ClientIdMiddleware>();
+app.UseWhen(context =>
+    !context.Request.Path.Equals("/api/users/auth", StringComparison.OrdinalIgnoreCase) ||
+    !context.Request.Path.Equals("/api/health", StringComparison.OrdinalIgnoreCase), appBuilder =>
+{
+    appBuilder.UseMiddleware<OwnershipMiddleware>();
+});
 
 if (app.Environment.IsProduction())
 {

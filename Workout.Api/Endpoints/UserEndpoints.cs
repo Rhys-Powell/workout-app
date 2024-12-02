@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Workout.Api.Data;
 using Workout.Api.Dtos;
@@ -15,7 +16,7 @@ public static class UserEndpoints
         var group = app.MapGroup("api/users").WithParameterValidation();
 
         // GET api/users
-        group.MapGet("/", async (WorkoutContext dbContext) =>
+        group.MapGet("/", [Authorize(Policy = "RequireAdmin")] async (WorkoutContext dbContext) =>
         {
             var users = await dbContext.Users
                 .Select(user => user.ToDto())
@@ -25,10 +26,10 @@ public static class UserEndpoints
             return Results.Ok(users);
         }).RequireAuthorization();
 
-        // GET api/users/{id}
-        group.MapGet("/{id}", async (int id, WorkoutContext dbContext) =>
+        // GET api/users/{userId}
+        group.MapGet("/{userId}", async (int userId, WorkoutContext dbContext) =>
         {
-            User? user = await dbContext.Users.FindAsync(id);
+            User? user = await dbContext.Users.FindAsync(userId);
 
             return user is null ? Results.NotFound() : Results.Ok(user.ToDto());
         })
@@ -43,7 +44,7 @@ public static class UserEndpoints
                 .FirstOrDefaultAsync();
 
             return user is null ? Results.NotFound() : Results.Ok(user.ToDto());
-        });
+        }).RequireAuthorization();
 
         // POST api/users
         group.MapPost("/", async (UserDto newUser, WorkoutContext dbContext) =>
@@ -53,13 +54,13 @@ public static class UserEndpoints
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            return Results.CreatedAtRoute(GetUserEndpointName, new { id = user.Id }, user.ToDto());
-        });
+            return Results.CreatedAtRoute(GetUserEndpointName, new { userId = user.Id }, user.ToDto());
+        }).RequireAuthorization();
 
-        // PUT api/users/{id}
-        group.MapPut("/{id}", async (int id, UserDto updatedUser, WorkoutContext dbContext) =>
+        // PUT api/users/{userId}
+        group.MapPut("/{userId}", async (int userId, UserDto updatedUser, WorkoutContext dbContext) =>
         {
-            var existingUser = await dbContext.Users.FindAsync(id);
+            var existingUser = await dbContext.Users.FindAsync(userId);
 
             if (existingUser is null)
             {
@@ -74,11 +75,11 @@ public static class UserEndpoints
             return Results.NoContent();
         }).RequireAuthorization();
 
-        // DELETE api/users/{id}
-        group.MapDelete("/{id}", async (int id, WorkoutContext dbContext) =>
+        // DELETE api/users/{userId}
+        group.MapDelete("/{userId}", async (int userId, WorkoutContext dbContext) =>
         {
             await dbContext.Users
-                .Where(user => user.Id == id)
+                .Where(user => user.Id == userId)
                 .ExecuteDeleteAsync();
 
             return Results.NoContent();
