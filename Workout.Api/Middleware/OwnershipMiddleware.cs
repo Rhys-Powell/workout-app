@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
 using Workout.Api.Data;
+using Workout.Api.Helpers;
 
 namespace Workout.Api.Middleware;
 
@@ -34,13 +35,14 @@ public class OwnershipMiddleware(RequestDelegate next)
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
 
-        var auth0Id = jwtToken.Payload["sub"]?.ToString();
-        if (auth0Id == null)
+        var fullAuth0Id = jwtToken.Payload["sub"]?.ToString();
+        if (fullAuth0Id == null)
         {
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Unauthorized");
             return;
         }
+        string auth0Id = StringHelper.ExtractSubstring(fullAuth0Id, "|");
 
         // If the route includes a userId, check if the user is making a request for their own data. If not, don't allow.
         var routeData = context.GetRouteData() ?? throw new Exception("Unable to determine resource ownership: route data is missing from the HTTP request.");
