@@ -39,7 +39,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173", "https://rhys-powell.github.io", "https://main--workout-app-rwp.netlify.app", "https://workout-app-rwp.netlify.app")
+                .WithOrigins("http://localhost:5173", "https://workout-app-rwp.netlify.app")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -59,29 +59,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuer = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            var env = context.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
-            var token = context.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            // Allow the mock token to pass through in dev
-            if (env.IsDevelopment() && token == "api-test-token")
-            {
-                var claims = new[] {
-                    new Claim(ClaimTypes.Name, "apiTestUser"),
-                    new Claim("permissions", "all")
-                };
-                var identity = new ClaimsIdentity(claims, "apiTesting");
-                context.Principal = new ClaimsPrincipal(identity);
-                context.Success();
-                return Task.CompletedTask;
-            }
-            return Task.CompletedTask;
-        }
     };
 });
 

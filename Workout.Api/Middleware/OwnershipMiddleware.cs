@@ -26,15 +26,8 @@ public class OwnershipMiddleware(RequestDelegate next)
             await context.Response.WriteAsync("Unauthorized");
             return;
         }
-        else if (token.Contains("api-test-token"))
-        {
-            await _next(context);
-            return;
-        }
-
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
-
         var fullAuth0Id = jwtToken.Payload["sub"]?.ToString();
         if (fullAuth0Id == null)
         {

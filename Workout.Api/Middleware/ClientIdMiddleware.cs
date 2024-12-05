@@ -30,12 +30,6 @@ public class ClientIdMiddleware
             await context.Response.WriteAsync("Authorization token is missing");
             return;
         }
-        else if (accessToken.Contains("api-test-token"))
-        {
-            await _next(context);
-            return;
-        }
-
         try
         {
             var handler = new JwtSecurityTokenHandler();

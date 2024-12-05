@@ -11,9 +11,15 @@ on:
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
+    environment: Development
     env:
-      ACCESS_TOKEN_DEV: ${{ secrets.ACCESS_TOKEN_DEV }}
-      PROXY_LOCAL_SERVER: ${{ vars.PROXY_LOCAL_SERVER }}
+      AUTH0_URL: ${{ vars.AUTH0_URL }}
+      AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
+      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      API_TESTER_ADMIN1_USERNAME: ${{ vars.API_TESTER_ADMIN1_USERNAME }}
+      API_TESTER_ADMIN1_PASSWORD: ${{ secrets.API_TESTER_ADMIN1_PASSWORD }}
+      BASE_URL: ${{ vars.BASE_URL }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
@@ -23,13 +29,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Check API readiness
-        run: |
-          if ! curl -f -H "Authorization: Bearer ${ACCESS_TOKEN_DEV}" "${PROXY_LOCAL_SERVER}/api/health"; then
-            echo "API is not ready."
-            exit 1  # Fail the job if the API is not ready
-          fi
-
       - name: Install Newman and Reporters
         run: |
           npm install -g newman
@@ -38,10 +37,14 @@ jobs:
       - name: Run Newman API tests
         run: |
           echo "Running Newman tests..."
-          newman run postman/Workout_app.postman_collection.json \
-            --global-var "access_token_dev=${ACCESS_TOKEN_DEV}" \
-            --environment postman/Local_development.postman_environment.json \
-            --env-var "base_url=${PROXY_LOCAL_SERVER}" \
+          newman run postman/"Workout-app functional API tests.postman_collection.json" \
+            --env-var "auth0_url=${AUTH0_URL}" \
+            --env-var "auth0_audience=${AUTH0_AUDIENCE}" \
+            --env-var "auth0_client_secret=${AUTH0_CLIENT_SECRET}" \
+            --env-var "auth0_client_id=${AUTH0_CLIENT_ID}" \
+            --env-var "api_tester_admin1_username=${API_TESTER_ADMIN1_USERNAME}" \
+            --env-var "api_tester_admin1_password=${API_TESTER_ADMIN1_PASSWORD}" \
+            --env-var "base_url=${BASE_URL}" \
             --reporters cli,html \
             --reporter-html-export newman/newman-report.html \
             --verbose > newman_output.log 2>&1 || {
