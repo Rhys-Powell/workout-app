@@ -16,4 +16,4 @@ Major work still to be done:
 
 The app is already deployed to https://workout-app-rwp.netlify.app and can be interacted with there. If you don't want to register with your real email, feel free to use a fake one as email verification is not required to log in.
 
-Link to my Postman collection for API integration testing (have to enter your own environment variable values): https://elements.getpostman.com/redirect?entityId=19177718-b7e9eeb2-407f-447d-b95a-cc403886aa1f&entityType=collection
+Link to my Postman collection for API integration testing (have to enter your own environment variable values): https://www.postman.com/speeding-shadow-539881/workout-app-api-testing/collection/yjjlcfy/workout-app-functional-api-tests
