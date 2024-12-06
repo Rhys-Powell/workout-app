@@ -9,6 +9,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Modal from '../components/Modal';
 import { useAuth } from '../context/UseAuthHook';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
+import './Routine.scoped.css';
 
 const typedErrors: Errors = errors;
 
@@ -117,6 +118,17 @@ export default function Routine() {
     setSelectorActive(false);
   }
 
+  function handleSaveClick() {
+    const itemsToUpdate: { ExerciseId: number; NewExerciseOrder: number; }[] = [];
+    
+    routineExercises.forEach((item) => {
+      itemsToUpdate.unshift({"ExerciseId": item.exerciseId, "NewExerciseOrder": item.exerciseOrder});
+    });
+    dataService.patchData('users/' + userId + '/routines/' + routineId, undefined, 
+      itemsToUpdate);
+    setEditMode(false);
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -159,12 +171,7 @@ export default function Routine() {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  style={{
-                    padding: 20,
-                    width: 250,
-                    minHeight: 500,
-                    border: '1px solid black',
-                  }}
+                  id="droppable-1"
                 >
                   {[...routineExercises]
                     .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
@@ -176,11 +183,8 @@ export default function Routine() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
+                              className="draggable-routineExercise"
                               style={{
-                                padding: 10,
-                                border: '1px solid black',
-                                marginBottom: 10,
-                                backgroundColor: 'black',
                                 ...provided.draggableProps.style,
                               }}
                             >
@@ -230,8 +234,7 @@ export default function Routine() {
               </select>
             </Modal>
            )} 
-          {/* TODO: Add save functionality to sync these changes with the databse*/}
-          <button onClick={() => setEditMode(false)}>Save</button>
+          <button onClick={() => handleSaveClick()}>Save</button>
         </>
       )}
     </>

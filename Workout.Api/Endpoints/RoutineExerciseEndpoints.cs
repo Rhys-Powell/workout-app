@@ -10,7 +10,6 @@ namespace Workout.Api.Endpoints;
 public static class RoutineExerciseEndpoints
 {
     const string GetRoutineExerciseEndpointName = "GetRoutineExercise";
-    private const int InvalidExerciseId = -1;
 
     public static RouteGroupBuilder MapRoutineExercisesEndpoints(this WebApplication app)
     {

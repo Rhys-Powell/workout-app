@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Workout.Api.Data;
 using Workout.Api.Dtos;
+using Workout.Api.Entities;
 using Workout.Api.Mapping;
 
 namespace Workout.Api.Endpoints;
@@ -65,6 +67,51 @@ public static class RoutineEndpoints
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
+        }).RequireAuthorization();
+
+        // PATCH api/users/{userId}/routines/{routineId}
+        group.MapPatch("/{routineId}", async (int routineId, [FromBody] ExerciseOrderUpdateDto[] itemsToUpdate, WorkoutContext dbContext) =>
+        {
+            var routineExercises = await dbContext.RoutineExercise
+                .Where(re => re.RoutineId == routineId)
+                .ToDictionaryAsync(re => re.ExerciseId);
+
+            var transaction = dbContext.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in itemsToUpdate)
+                {
+                    int toUpdateExerciseId = item.ExerciseId;
+                    int newExerciseOrder = item.NewExerciseOrder;
+
+                    if (newExerciseOrder <= 0)
+                    {
+                        return Results.BadRequest("Order can't be negative or zero");
+                    }
+
+                    if (!routineExercises.TryGetValue(toUpdateExerciseId, out var routineExerciseEntityToPatch))
+                    {
+                        return Results.NotFound("Routine exercise not found");
+                    }
+
+                    routineExerciseEntityToPatch.ExerciseOrder = newExerciseOrder;
+                }
+
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Results.Ok();
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine(ex.InnerException.Message);
+                    Console.WriteLine(ex.InnerException.StackTrace);
+                }
+                await transaction.RollbackAsync();
+                throw;
+            }
         }).RequireAuthorization();
 
         // DELETE api/users/{userId}/routines/{routineId}

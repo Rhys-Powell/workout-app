@@ -32,8 +32,27 @@ const DataService = (token: string | null) => {
         'Content-Type': 'application/json',
       },
     });
-      return response.json();
+    const responseBody = await response.text();
+    if (!responseBody) { 
+      return null;
+    } 
+    return response.json();
   };    
+
+  const patchData = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
+    const response = await apiRequest(endpoint, params, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseBody = await response.text();
+    if (!responseBody) { 
+      return null;
+    } 
+    return response.json();
+  };
 
   const deleteData = async (endpoint: string, params: { [key: string]: string } = {}) => {
     const response = await apiRequest(endpoint, params, {
@@ -53,12 +72,17 @@ const DataService = (token: string | null) => {
         'Content-Type': 'application/json',
       },
     });
+    const responseBody = await response.text();
+    if (!responseBody) { 
+      return null;
+    } 
     return response.json();
   };
 
 return {
   getData,
   postData,
+  patchData,
   deleteData,
   postDataWithQueryString
 };

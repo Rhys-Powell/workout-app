@@ -1,0 +1,13 @@
+#droppable-1 {
+    padding: 20px;
+    width: 250px;
+    min-height: 500px;
+    border: 1px solid black;
+}
+
+.draggable-routineExercise {
+    padding: 10px;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    background-color: black;
+}
