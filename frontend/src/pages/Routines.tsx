@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataService from '../DataService';
 import { Routine } from '../types/Routine';
 import { Link } from 'react-router-dom';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
-import { useAuth } from '../context/UseAuthHook';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const typedErrors: Errors = errors;
 
@@ -18,14 +18,17 @@ export default function Routines() {
   const { currentUser } = useCurrentUser();
   const userId = currentUser?.id; 
   const userIdRef = useRef<string | undefined>(userId?.toString()); 
-  const { token } = useAuth();
-  const dataService = useMemo(() => DataService(token), [token]);
+  const { getAccessTokenSilently } = useAuth0();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
+  const dataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getRoutines() {
+      const token = await memoizedGetAccessTokenSilently();
       try {
-        const data: Routine[] = await dataService.getData('users/' + userIdRef.current + '/routines');
+        const data: Routine[] = await dataService.getData(token, 'users/' + userIdRef.current + '/routines');
         setError(false);
         setIsDataFetched(true);
         return data;
@@ -34,15 +37,15 @@ export default function Routines() {
         setError(true);
       }
     }
-
     getRoutines().then((value) => setRoutines(value ?? []));
-  }, [dataService]);
+  }, [dataService, memoizedGetAccessTokenSilently]);
 
   async function createRoutine() {
+    const token = await memoizedGetAccessTokenSilently();
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData('users/' + userId.toString() + '/routines', {}, { userId: userId.toString(), name: input.name });
+        const response = await dataService.postData(token, 'users/' + userId.toString() + '/routines', {}, { userId: userId.toString(), name: input.name });
         setRoutines((prevRoutines) => [...prevRoutines, response]);
       } catch (error) {
           console.error(error);
@@ -55,9 +58,10 @@ export default function Routines() {
   }
 
   async function deleteRoutine(routineId: number) {
+    const token = await memoizedGetAccessTokenSilently();
     if (userId != null) {
       try {
-        await dataService.deleteData('users/' + userId + '/routines/' + routineId);
+        await dataService.deleteData(token, 'users/' + userId + '/routines/' + routineId);
       } catch (error) {
         console.error(error);
         setError(true);

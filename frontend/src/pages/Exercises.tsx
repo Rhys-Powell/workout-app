@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
 import DataService from '../DataService';
-import { useAuth } from '../context/UseAuthHook';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const typedErrors: Errors = errors;
 
@@ -18,14 +18,17 @@ export default function Exercises() {
   const { currentUser }= useCurrentUser(); 
   const userId = currentUser?.id;
   const userIdRef = useRef<string | undefined>(userId?.toString()); 
-  const { token } = useAuth();
-  const dataService = useMemo(() => DataService(token), [token]);
+  const { getAccessTokenSilently } = useAuth0();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
+  const dataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getExercises() {
+      const token = await memoizedGetAccessTokenSilently();
       try {
-        const response = await dataService.getData('users/' + userIdRef.current + '/exercises');
+        const response = await dataService.getData(token, 'users/' + userIdRef.current + '/exercises');
         setError(false);
         if (Array.isArray(response)) {
           setIsDataFetched(true);
@@ -40,13 +43,14 @@ export default function Exercises() {
     }
 
     getExercises().then((value) => setExercises(value ?? []));
-  }, [dataService]);
+  }, [dataService, memoizedGetAccessTokenSilently]);
 
   async function createExercise() {
+    const token = await memoizedGetAccessTokenSilently();
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData('users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
+        const response = await dataService.postData(token, 'users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
         setExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
         console.error(error);
@@ -59,9 +63,10 @@ export default function Exercises() {
   }
 
   async function deleteExercise(exerciseId: number) {
+    const token = await memoizedGetAccessTokenSilently();
     if (userId != null) {
       try {
-        await dataService.deleteData('users/' + userId + '/exercises/' + exerciseId);
+        await dataService.deleteData(token, 'users/' + userId + '/exercises/' + exerciseId);
       } catch (error) {
         console.error(error);
         setError(true);

@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-const DataService = (token: string | null) => {
-  const apiRequest = async (endpoint: string, params: { [key: string]: string } = {}, options: RequestInit = {}) => {
+const DataService = () => {
+  const apiRequest = async (token: string, endpoint: string, params: { [key: string]: string } = {}, options: RequestInit = {}) => {
   try {
     const url = new URL(`${API_BASE_URL}/api/${endpoint}`);
     Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
@@ -17,30 +17,32 @@ const DataService = (token: string | null) => {
   }
 };
 
-  const getData = async (endpoint: string, params: { [key: string]: string} = {}) => {
-    const response = await apiRequest(endpoint, params, {
+  const getData = async (token: string, endpoint: string, params: { [key: string]: string} = {}) => {
+    const response = await apiRequest(token, endpoint, params, {
       method: 'GET',
     });
-    return response.json();
+    if (response.ok) {
+      return response.json();
+    }
   };
 
-  const postData = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
-    const response = await apiRequest(endpoint, params, {
+  const postData = async (token: string, endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
+    const response = await apiRequest(token, endpoint, params, {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    const responseBody = await response.text();
+    const responseBody = await response.json();
     if (!responseBody) { 
       return null;
     } 
-    return response.json();
+    return responseBody;
   };    
 
-  const patchData = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
-    const response = await apiRequest(endpoint, params, {
+  const patchData = async (token: string,endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
+    const response = await apiRequest(token, endpoint, params, {
       method: 'PATCH',
       body: JSON.stringify(data),
       headers: {
@@ -54,18 +56,20 @@ const DataService = (token: string | null) => {
     return response.json();
   };
 
-  const deleteData = async (endpoint: string, params: { [key: string]: string } = {}) => {
-    const response = await apiRequest(endpoint, params, {
+  const deleteData = async (token: string, endpoint: string, params: { [key: string]: string } = {}) => {
+    const response = await apiRequest(token, endpoint, params, {
       method: 'DELETE',
     });
     if (response.status === 204) {
       return null;
     }
-    return response.json();
+    if (response.ok) {
+      return response.json();
+    }
   };
 
-  const postDataWithQueryString = async (endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
-    const response = await apiRequest(endpoint, params, {
+  const postDataWithQueryString = async (token: string,endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
+    const response = await apiRequest(token, endpoint, params, {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {

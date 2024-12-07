@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
 import DataService from '../DataService';
 import { Link, useParams } from 'react-router-dom';
@@ -7,9 +7,9 @@ import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Modal from '../components/Modal';
-import { useAuth } from '../context/UseAuthHook';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
 import './Routine.scoped.css';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const typedErrors: Errors = errors;
 
@@ -19,20 +19,23 @@ export default function Routine() {
   const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<Exercise[]>([]);
   const [error, setError] = useState(false);
-  const [isDataFetched, setIsDataFetched] = useState(false);
   // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const { currentUser }= useCurrentUser(); 
   const userId = currentUser?.id;
   const userIdRef = useRef<string | undefined>(userId?.toString());  
   const { routineId } = useParams();
   const routineIdRef = useRef<string | undefined>(routineId);
-  const { token } = useAuth();
-  const dataService = useMemo(() => DataService(token), [token]);
+  const { getAccessTokenSilently } = useAuth0();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
+  const memoizedDataService = useMemo(() => DataService(), []);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getRoutineExercises() {
+      const token = await memoizedGetAccessTokenSilently();
       try {
-        const data: RoutineExercise[] = await dataService.getData(
+        const data: RoutineExercise[] = await memoizedDataService.getData(token, 
           'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises',
           {
             includeDetails: 'true',
@@ -52,11 +55,12 @@ export default function Routine() {
     }
 
     getRoutineExercises().then((value) => setRoutineExercises(value ?? []));
-  }, [dataService]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently]);
 
   async function getExercises() {
+    const token = await memoizedGetAccessTokenSilently();
     try {
-      const data: Exercise[] = await dataService.getData('users/' + userId + '/exercises');
+      const data: Exercise[] = await memoizedDataService.getData(token, 'users/' + userId + '/exercises');
       return data;
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -69,10 +73,11 @@ export default function Routine() {
   }
 
   async function addRoutineExercise(selectedId: number) {
+    const token = await memoizedGetAccessTokenSilently();
     if (userIdRef.current != null && selectedId > -1) {
       const exerciseId: string = selectedId.toString();
       try {
-        const response = await dataService.postData(
+        const response = await memoizedDataService.postData(token, 
           'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises', { 'exerciseId': exerciseId }
         );
         setRoutineExercises((prevExercises) => [...prevExercises, response]);
@@ -91,9 +96,10 @@ export default function Routine() {
   }
 
   async function removeRoutineExercise(exerciseId: number, routineExerciseId: number) {
+    const token = await memoizedGetAccessTokenSilently();  
     if (userId != null) {
       try {
-        await dataService.deleteData('users/' + userId + '/routines/' + routineId + '/exercises/' + exerciseId);
+        await memoizedDataService.deleteData(token, 'users/' + userId + '/routines/' + routineId + '/exercises/' + exerciseId);
         setError(false);
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -120,13 +126,15 @@ export default function Routine() {
     setSelectorActive(false);
   }
 
-  function handleSaveClick() {
+  async function handleSaveClick() {
     const itemsToUpdate: { ExerciseId: number; NewExerciseOrder: number; }[] = [];
     
     routineExercises.forEach((item) => {
       itemsToUpdate.unshift({"ExerciseId": item.exerciseId, "NewExerciseOrder": item.exerciseOrder});
     });
-    dataService.patchData('users/' + userId + '/routines/' + routineId, undefined, 
+    
+    const token = await memoizedGetAccessTokenSilently();
+    memoizedDataService.patchData(token, 'users/' + userId + '/routines/' + routineId, undefined, 
       itemsToUpdate);
     setEditMode(false);
   }
@@ -160,10 +168,13 @@ export default function Routine() {
                 </Link>
               </div>
             ))}
-          <button onClick={() => setEditMode(true)}>Edit</button>
+          
         </>
     )}
-    
+    {!editMode && isDataFetched &&
+      <button onClick={() => setEditMode(true)}>Edit</button>
+    }
+        
     {editMode && (
       <>
         <DragDropContext

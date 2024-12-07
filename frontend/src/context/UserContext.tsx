@@ -1,9 +1,9 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { User } from '../types/User';
 import { extractSubstring } from '../helpers/extractSubstring';
-import { useAuth } from './UseAuthHook';
+import { useAuth0 } from '@auth0/auth0-react';
+import DataService from '../DataService';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
 export interface UserContextType {
   currentUser: User | null;
   updateCurrentUser (user: User | null) : void;
@@ -14,33 +14,32 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [ currentUser, setCurrentUser ] = useState<User | null>(null);
-  const { token, user: auth0user } = useAuth();
   const [ isUserFetched, setIsUserFetched] = useState(false);
+  const { getAccessTokenSilently, user: auth0user } = useAuth0();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
+  const dataService = useMemo(() => DataService(), []);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
+      const token = await memoizedGetAccessTokenSilently(); 
       if (auth0user && token) {
         const auth0id = extractSubstring(auth0user.sub!, '|');
         try {
-          const response = await fetch(`${API_BASE_URL}/api/users/auth/${auth0id}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            }
-          })
-          const fetchedUser = await response.json();
-          if (fetchedUser) {
-              setCurrentUser(fetchedUser);
+          const response = await dataService.getData(token, 'users/auth/' + auth0id);
+          if (response) {
+            const fetchedUser: User = response;
+            setCurrentUser(fetchedUser);
           }
-          setIsUserFetched(true);
-        } catch (error) {
-          console.error('Error fetching user:', error);
         }
+        catch (error) {
+          console.error(error);
+        }
+        setIsUserFetched(true);
       }
     }
     fetchCurrentUser();
-  }, [auth0user, token]);
+  }, [auth0user, dataService, memoizedGetAccessTokenSilently]);
   
   const updateCurrentUser = (newUser: User | null) => {
     setCurrentUser(newUser);

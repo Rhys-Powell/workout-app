@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ExerciseSets from './ExerciseSets';
 import ExerciseHistory from './ExerciseHistory';
 import Timer from './Timer';
@@ -7,8 +7,8 @@ import { useParams } from 'react-router-dom';
 import DataService from '../DataService';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
-import { useAuth } from '../context/UseAuthHook';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const typedErrors: Errors = errors;
 
@@ -16,31 +16,33 @@ export function Exercise() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState(false);
   const [exercise, setExercise] = useState<Exercise>();
-  const [isDataFetched, setIsDataFetched] = useState(false);
   // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const { currentUser }= useCurrentUser(); 
   const userId = currentUser?.id; 
   const userIdRef = useRef<string | undefined>(userId?.toString()); 
   const { exerciseId } = useParams();
   const exerciseIdRef = useRef(exerciseId);
-  const { token } = useAuth();
-  const dataService = useMemo(() => DataService(token), [token]);
+  const { getAccessTokenSilently } = useAuth0();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
+  const dataService = useMemo(() => DataService(), []);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getExercise() {
+      const token = await memoizedGetAccessTokenSilently();
       try {
-        const data: Exercise = await dataService.getData('users/' + userIdRef.current + '/exercises/' + exerciseIdRef.current);
+        const data: Exercise = await dataService.getData(token, 'users/' + userIdRef.current + '/exercises/' + exerciseIdRef.current);
         setError(false);
         setIsDataFetched(true);
         return data;
       } catch (error) {
         console.error(error);
-          setError(true);
+        setError(true);
       }
     }
-
     getExercise().then((value) => setExercise(value));
-  }, [dataService]);
+  }, [dataService, memoizedGetAccessTokenSilently]);
 
   return (
     <div>
