@@ -20,6 +20,7 @@ export default function Exercises() {
   const userIdRef = useRef<string | undefined>(userId?.toString()); 
   const { token } = useAuth();
   const dataService = useMemo(() => DataService(token), [token]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getExercises() {
@@ -27,17 +28,14 @@ export default function Exercises() {
         const response = await dataService.getData('users/' + userIdRef.current + '/exercises');
         setError(false);
         if (Array.isArray(response)) {
+          setIsDataFetched(true);
           return response;
         } else {
           console.error('Expected response to be an array');
         }
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch ', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
     }
 
@@ -51,12 +49,8 @@ export default function Exercises() {
         const response = await dataService.postData('users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
         setExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
       setError(false);
     } else {
@@ -69,12 +63,8 @@ export default function Exercises() {
       try {
         await dataService.deleteData('users/' + userId + '/exercises/' + exerciseId);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
       setExercises((prevExercises) => prevExercises.filter((e) => e.id !== exerciseId));
       setError(false);
@@ -101,15 +91,22 @@ export default function Exercises() {
 
   return (
     <>
-      {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {exercises.length === 0 ? <p>No exercises found</p> :
-        exercises.map((exercise) => (
-          <div key={exercise.id}>
-            <Link to={`${exercise.id}`}>{exercise.name}</Link>
-            <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
-          </div>
-      ))}
+      {!createMode && (
+        error ? <p>{typedErrors.FAIL_TO_FETCH}</p>
+        : !isDataFetched ? <p>Loading...</p>
+        : exercises.length === 0 ? <p>No exercises found</p> 
+        :
+        <> 
+          {exercises.map((exercise) => (
+            <div key={exercise.id}>
+              <Link to={`${exercise.id}`}>{exercise.name}</Link>
+              <button onClick={() => deleteExercise(exercise.id)}>Delete</button>
+            </div>
+          ))}
+        </> 
+      )}
       {!createMode && <button onClick={changeMode}>Create exercise</button>}
+            
       {createMode && (
         <form onSubmit={(event) => handleSubmit(event)}>
           <label>

@@ -16,6 +16,7 @@ export function Exercise() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState(false);
   const [exercise, setExercise] = useState<Exercise>();
+  const [isDataFetched, setIsDataFetched] = useState(false);
   // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const { currentUser }= useCurrentUser(); 
   const userId = currentUser?.id; 
@@ -30,14 +31,11 @@ export function Exercise() {
       try {
         const data: Exercise = await dataService.getData('users/' + userIdRef.current + '/exercises/' + exerciseIdRef.current);
         setError(false);
+        setIsDataFetched(true);
         return data;
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
+        console.error(error);
           setError(true);
-        } else {
-          console.error(error);
-        }
       }
     }
 
@@ -47,7 +45,10 @@ export function Exercise() {
   return (
     <div>
       <TabSelector changeActiveTab={setActiveIndex} />
-      <h1>{error ? typedErrors.FAIL_TO_FETCH : exercise?.name}</h1>
+      { error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
+        : isDataFetched ? <h1>{exercise?.name}</h1>
+        : <p>Loading...</p> 
+      }
       <ExerciseSets isActive={activeIndex === 0} />
       <ExerciseHistory isActive={activeIndex === 1} />
       <Timer />

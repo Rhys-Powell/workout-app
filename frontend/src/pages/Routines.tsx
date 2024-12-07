@@ -20,20 +20,18 @@ export default function Routines() {
   const userIdRef = useRef<string | undefined>(userId?.toString()); 
   const { token } = useAuth();
   const dataService = useMemo(() => DataService(token), [token]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getRoutines() {
       try {
         const data: Routine[] = await dataService.getData('users/' + userIdRef.current + '/routines');
         setError(false);
+        setIsDataFetched(true);
         return data;
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
     }
 
@@ -47,12 +45,8 @@ export default function Routines() {
         const response = await dataService.postData('users/' + userId.toString() + '/routines', {}, { userId: userId.toString(), name: input.name });
         setRoutines((prevRoutines) => [...prevRoutines, response]);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
           console.error(error);
-        }
+          setError(true);
       }
       setError(false);
     } else {
@@ -65,12 +59,8 @@ export default function Routines() {
       try {
         await dataService.deleteData('users/' + userId + '/routines/' + routineId);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
       setRoutines((prevRoutines) => prevRoutines.filter((r) => r.id !== routineId));
       setError(false);
@@ -97,9 +87,11 @@ export default function Routines() {
 
   return (
     <>
-      {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {routines.length === 0 ? <p>No routines found</p> :
-        routines.map((routine) => (
+      {!createMode &&
+        error ? <p>{typedErrors.FAIL_TO_FETCH}</p> :
+        !isDataFetched ? <p>Loading...</p> :
+        routines.length === 0 ? <p>No routines found</p> :
+        routines.map(routine => (
           <div key={routine.id}>
             <Link to={`${routine.id}`}>{routine.name}</Link>
             <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
@@ -107,6 +99,7 @@ export default function Routines() {
         ))
       }
       {!createMode && <button onClick={handleClick}>Create routine</button>}
+      
       {createMode && (
         <form onSubmit={(event) => handleSubmit(event)}>
           <label>

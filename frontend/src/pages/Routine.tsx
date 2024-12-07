@@ -19,6 +19,7 @@ export default function Routine() {
   const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<Exercise[]>([]);
   const [error, setError] = useState(false);
+  const [isDataFetched, setIsDataFetched] = useState(false);
   // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const { currentUser }= useCurrentUser(); 
   const userId = currentUser?.id;
@@ -37,6 +38,8 @@ export default function Routine() {
             includeDetails: 'true',
           },
         );
+        setError(false);
+        setIsDataFetched(true);
         return data;
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -54,7 +57,6 @@ export default function Routine() {
   async function getExercises() {
     try {
       const data: Exercise[] = await dataService.getData('users/' + userId + '/exercises');
-      setError(false);
       return data;
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -143,11 +145,12 @@ export default function Routine() {
   };
 
   return (
-    <>
-      {error && <p>{typedErrors.FAIL_TO_FETCH}</p>}
-      {!editMode && (
-        <>
-          {routineExercises.length === 0 && <p>No exercises found</p>}
+  <>
+    {!editMode && (
+      error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
+      : !isDataFetched ? <p>Loading...</p> 
+      : routineExercises.length === 0 ? <p>No exercises found</p> 
+      : <>
           {[...routineExercises]
             .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
             .map((routineExercise) => (
@@ -159,84 +162,84 @@ export default function Routine() {
             ))}
           <button onClick={() => setEditMode(true)}>Edit</button>
         </>
-      )}
-
-      {editMode && (
-        <>
-          <DragDropContext
-            onDragEnd={handleDragEnd}
-          >
-            <Droppable droppableId="droppable-1">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  id="droppable-1"
-                >
-                  {[...routineExercises]
-                    .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
-                    .map(
-                      (routineExercise, index) => (
-                        <Draggable key={routineExercise.id} draggableId={routineExercise.id.toString()} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="draggable-routineExercise"
-                              style={{
-                                ...provided.draggableProps.style,
-                              }}
+    )}
+    
+    {editMode && (
+      <>
+        <DragDropContext
+          onDragEnd={handleDragEnd}
+        >
+          <Droppable droppableId="droppable-1">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                id="droppable-1"
+              >
+                {[...routineExercises]
+                  .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+                  .map(
+                    (routineExercise, index) => (
+                      <Draggable key={routineExercise.id} draggableId={routineExercise.id.toString()} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="draggable-routineExercise"
+                            style={{
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            <Link to={`/users/${userId}/exercises/${routineExercise.exercise.id}`}>
+                              {routineExercise.exercise.name}
+                            </Link>
+                            <button
+                              onClick={() => removeRoutineExercise(routineExercise.exercise.id, routineExercise.id)}
                             >
-                              <Link to={`/users/${userId}/exercises/${routineExercise.exercise.id}`}>
-                                {routineExercise.exercise.name}
-                              </Link>
-                              <button
-                                onClick={() => removeRoutineExercise(routineExercise.exercise.id, routineExercise.id)}
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          )}
-                        </Draggable>
-                      ),
-                      // }
-                    )}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-          {!selectorActive && (
-            <button
-              onClick={() => {
-                setSelectorActive(true)
-                populateSelectorList();
-              }}
-            >
-              Add exercise
-            </button>
-          )}
-          {selectorActive && (
-            <Modal onClose={() => setSelectorActive(false)}>
-              <label htmlFor="dropdown">Select an option:</label>
-              <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
-                <option value="-1"></option>
-                {options
-                  .filter(
-                    (option) => !routineExercises.some((routineExercise) => routineExercise.exercise.id === option.id),
-                  )
-                  .map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-              </select>
-            </Modal>
-           )} 
-          <button onClick={() => handleSaveClick()}>Save</button>
-        </>
-      )}
-    </>
+                              Remove
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    ),
+                    // }
+                  )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+        {!selectorActive && (
+          <button
+            onClick={() => {
+              setSelectorActive(true)
+              populateSelectorList();
+            }}
+          >
+            Add exercise
+          </button>
+        )}
+        {selectorActive && (
+          <Modal onClose={() => setSelectorActive(false)}>
+            <label htmlFor="dropdown">Select an option:</label>
+            <select id="dropdown" onChange={(event) => handleSelectorChange(event)}>
+              <option value="-1"></option>
+              {options
+                .filter(
+                  (option) => !routineExercises.some((routineExercise) => routineExercise.exercise.id === option.id),
+                )
+                .map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
+                  </option>
+                ))}
+            </select>
+          </Modal>
+          )} 
+        <button onClick={() => handleSaveClick()}>Save</button>
+      </>
+    )}
+  </>
   );
-}
+};
