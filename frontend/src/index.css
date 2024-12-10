@@ -60,8 +60,13 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.has-tooltip:hover ~ .tooltip {
-  visibility: visible;
+.tooltip-container .tooltip {
+  color: black;
+  font-size: 0.8em;
+  white-space: pre-wrap;
+  text-align: left;
+  border: 1px solid #ddd;
+  background-color: lightgray;
 }
 
 @media (prefers-color-scheme: light) {

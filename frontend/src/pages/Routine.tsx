@@ -10,6 +10,8 @@ import Modal from '../components/Modal';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
 import './Routine.scoped.css';
 import { useAuth0 } from '@auth0/auth0-react';
+import tooltip from '../../metadata/tooltips.json';
+import { Tooltip } from 'react-tooltip';
 
 const typedErrors: Errors = errors;
 
@@ -152,6 +154,10 @@ export default function Routine() {
     setRoutineExercises(newItems);
   };
 
+  function beginWorkout() {
+    // TODO: implement begin workout logic
+  }
+
   return (
   <>
     {!editMode && (
@@ -172,9 +178,15 @@ export default function Routine() {
         </>
     )}
     {!editMode && isDataFetched &&
-      <button onClick={() => setEditMode(true)}>Edit</button>
+      <div className="tooltip-container">
+        <button onClick={() => setEditMode(true)}>Edit</button>
+        <button disabled={routineExercises.length < 1} data-tooltip-id="begin-workout-button-tooltip" onClick={() => beginWorkout()}>
+            Begin workout
+          </button>
+        <Tooltip id="begin-workout-button-tooltip" className="tooltip" content={routineExercises.length < 1 ? tooltip.BEGIN_WORKOUT_TOOLTIP : ''} place="bottom"/>  
+      </div>
     }
-        
+
     {editMode && (
       <>
         <DragDropContext

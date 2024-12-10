@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip } from './Tooltip';
 import './SignupForm.scoped.css';
 import tooltip from '../../metadata/tooltips.json';
+import { Tooltip } from 'react-tooltip';
 
 const SignupForm = () => {
   const [email, setEmail] = useState('');
@@ -50,13 +50,13 @@ const SignupForm = () => {
         Email:
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </label>
-      <div className="input-wrapper">
-        <label className="has-tooltip" >
+      <div className="tooltip-container">
+        <label data-tooltip-id="password-tooltip">
           Password:
           <input  type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
-        <Tooltip text={tooltip.PASSWORD_TOOLTIP} />
-      </div>
+        <Tooltip id="password-tooltip" className="tooltip" content={tooltip.PASSWORD_TOOLTIP} place="bottom"/>
+      </div> 
       <label>
         Name:
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />

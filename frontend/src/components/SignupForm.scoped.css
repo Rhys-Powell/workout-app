@@ -15,17 +15,3 @@ input {
 .input-wrapper {
     position: relative;
 }
-
-.tooltip {
-    color: black;
-    font-size: 0.8em;
-    white-space: pre-wrap;
-    text-align: left;
-    position: absolute;
-    top: 100%;
-    border: 1px solid #ddd;
-    padding: 5px;
-    visibility: hidden;
-    z-index: 100;
-    background-color: lightgray;
-}

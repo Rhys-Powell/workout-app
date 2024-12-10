@@ -1,3 +1,4 @@
 {
-  "PASSWORD_TOOLTIP": "Password must be: \n- at least 8 characters long \n- no more than 2 identical characters in a row."
+  "PASSWORD_TOOLTIP": "Password must be: \n- at least 8 characters long \n- no more than 2 identical characters in a row.",
+  "BEGIN_WORKOUT_TOOLTIP": "Add at least one exercise to your routine by clicking 'Edit'."
 }

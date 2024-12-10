@@ -50,7 +50,6 @@ public class ClientIdMiddleware
             return;
         }
 
-        // Continue processing the request
         await _next(context);
     }
 }
