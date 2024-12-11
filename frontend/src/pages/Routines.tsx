@@ -6,6 +6,7 @@ import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { useCurrentUser } from '../context/UseCurrentUserHook';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 
 const typedErrors: Errors = errors;
 
@@ -23,6 +24,7 @@ export default function Routines() {
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
   const dataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
+  const { getCurrentWorkoutRoutineId, removeCurrentWorkout } = useWorkoutContext();
 
   useEffect(() => {
     async function getRoutines() {
@@ -39,6 +41,10 @@ export default function Routines() {
     }
     getRoutines().then((value) => setRoutines(value ?? []));
   }, [dataService, memoizedGetAccessTokenSilently]);
+
+  useEffect(() => {
+    checkForDeletedRoutine();
+  }), [routines];
 
   async function createRoutine() {
     const token = await memoizedGetAccessTokenSilently();
@@ -70,6 +76,16 @@ export default function Routines() {
       setError(false);
     } else {
       console.error('User ID is null');
+    }
+  }
+
+  function checkForDeletedRoutine() {
+    const currentWorkoutId = getCurrentWorkoutRoutineId();
+    if (isDataFetched) {
+      const currentWorkoutRoutineExists = routines.find((r) => r.id.toString() === currentWorkoutId);
+      if (!currentWorkoutRoutineExists) {
+        removeCurrentWorkout();
+      }
     }
   }
 

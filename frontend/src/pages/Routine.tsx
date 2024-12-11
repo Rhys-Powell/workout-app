@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
 import DataService from '../DataService';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
@@ -12,10 +12,13 @@ import './Routine.scoped.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import tooltip from '../../metadata/tooltips.json';
 import { Tooltip } from 'react-tooltip';
+import { useWorkoutContext } from '../context/UseWorkoutContextHook';
+import { useSyncCurrentWorkout } from '../context/UseSyncCurrentWorkout';
 
 const typedErrors: Errors = errors;
 
 export default function Routine() {
+  const navigate = useNavigate();
   const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
   const [selectorActive, setSelectorActive] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -23,6 +26,7 @@ export default function Routine() {
   const [error, setError] = useState(false);
   // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const { currentUser }= useCurrentUser(); 
+  const { updateCurrentWorkout } = useWorkoutContext();
   const userId = currentUser?.id;
   const userIdRef = useRef<string | undefined>(userId?.toString());  
   const { routineId } = useParams();
@@ -32,6 +36,7 @@ export default function Routine() {
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
   const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
+  const syncCurrentWorkout = useSyncCurrentWorkout(routineIdRef.current?.toString() ?? '', routineExercises);
 
   useEffect(() => {
     async function getRoutineExercises() {
@@ -45,6 +50,7 @@ export default function Routine() {
         );
         setError(false);
         setIsDataFetched(true);
+        
         return data;
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -57,7 +63,11 @@ export default function Routine() {
     }
 
     getRoutineExercises().then((value) => setRoutineExercises(value ?? []));
-  }, [memoizedDataService, memoizedGetAccessTokenSilently]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently, syncCurrentWorkout]);
+
+  useEffect(() => {
+    syncCurrentWorkout;
+  },[syncCurrentWorkout]);
 
   async function getExercises() {
     const token = await memoizedGetAccessTokenSilently();
@@ -130,11 +140,9 @@ export default function Routine() {
 
   async function handleSaveClick() {
     const itemsToUpdate: { ExerciseId: number; NewExerciseOrder: number; }[] = [];
-    
     routineExercises.forEach((item) => {
       itemsToUpdate.unshift({"ExerciseId": item.exerciseId, "NewExerciseOrder": item.exerciseOrder});
     });
-    
     const token = await memoizedGetAccessTokenSilently();
     memoizedDataService.patchData(token, 'users/' + userId + '/routines/' + routineId, undefined, 
       itemsToUpdate);
@@ -155,7 +163,10 @@ export default function Routine() {
   };
 
   function beginWorkout() {
-    // TODO: implement begin workout logic
+    const sortedExercises = routineExercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
+    updateCurrentWorkout(sortedExercises);
+    const firstExerciseId = sortedExercises[0].exerciseId;
+    navigate(`/users/${userId}/exercises/${firstExerciseId}`)
   }
 
   return (
@@ -183,7 +194,7 @@ export default function Routine() {
         <button disabled={routineExercises.length < 1} data-tooltip-id="begin-workout-button-tooltip" onClick={() => beginWorkout()}>
             Begin workout
           </button>
-        <Tooltip id="begin-workout-button-tooltip" className="tooltip" content={routineExercises.length < 1 ? tooltip.BEGIN_WORKOUT_TOOLTIP : ''} place="bottom"/>  
+        <Tooltip id="begin-workout-button-tooltip" className="tooltip" clickable content={routineExercises.length < 1 ? tooltip.BEGIN_WORKOUT_TOOLTIP : ''} place="bottom"/>  
       </div>
     }
 
