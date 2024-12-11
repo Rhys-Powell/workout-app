@@ -35,7 +35,6 @@ const SignupForm = () => {
 
       if (response.ok) {
         navigate('/profile');
-        console.log('Signup successful:', data);
       } else {
         setErrorMessage(data.description || 'Something went wrong during signup.');
       }
