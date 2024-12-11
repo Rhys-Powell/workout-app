@@ -4,7 +4,8 @@ import { RoutineExercise } from "../types/RoutineExercises";
 export interface WorkoutContextType {
     getCurrentWorkoutExercises: () =>RoutineExercise[] | [];
     getCurrentWorkoutRoutineId: () => string | null;
-    updateCurrentWorkout: (routineExercises: RoutineExercise[] | null) => void;
+    getCurrentWorkoutRoutineName: () => string | null;
+    updateCurrentWorkout: (routineExercises: RoutineExercise[] | null, routineName: string) => void;
     removeCurrentWorkout: () => void;
 }
 
@@ -25,21 +26,30 @@ const WorkoutProvider = ({ children }: { children: React.ReactNode }) => {
     }
     return null;
   }
+
+  const getCurrentWorkoutRoutineName: () => string | null = () => {
+    if (localStorage.getItem("currentWorkoutRoutineName")) {
+      return JSON.parse(localStorage.getItem("currentWorkoutRoutineName")!);
+    }
+    return null;
+  }
   
-  const updateCurrentWorkout = (RoutineExercises: RoutineExercise[] | null) => {
+  const updateCurrentWorkout = (RoutineExercises: RoutineExercise[] | null, RoutineName: string) => {
     if (RoutineExercises) {
       localStorage.setItem("currentWorkoutExercises", JSON.stringify(RoutineExercises));
       localStorage.setItem("currentWorkoutRoutineId", JSON.stringify(RoutineExercises?.[0]?.routineId.toString()));
+      localStorage.setItem("currentWorkoutRoutineName", JSON.stringify(RoutineName));
     }
   };
 
   const removeCurrentWorkout = () => {
     localStorage.removeItem("currentWorkoutExercises");
     localStorage.removeItem("currentWorkoutRoutineId");
+    localStorage.removeItem("currentWorkoutRoutineName");
   };
 
   return (
-    <WorkoutContext.Provider value={{ getCurrentWorkoutExercises, getCurrentWorkoutRoutineId, updateCurrentWorkout, removeCurrentWorkout }}>
+    <WorkoutContext.Provider value={{ getCurrentWorkoutExercises, getCurrentWorkoutRoutineId, getCurrentWorkoutRoutineName, updateCurrentWorkout, removeCurrentWorkout }}>
       {children}
     </WorkoutContext.Provider>
   );

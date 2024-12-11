@@ -1,13 +1,13 @@
 import { RoutineExercise } from "../types/RoutineExercises";
 import { useWorkoutContext } from "./UseWorkoutContextHook"; 
 
-export function useSyncCurrentWorkout(routineId: string, routineExercises: RoutineExercise[]) {
+export function useSyncCurrentWorkout(routineExercises: RoutineExercise[], routineId: string, routineName: string) {
   const { getCurrentWorkoutRoutineId, updateCurrentWorkout } = useWorkoutContext();
   
   const currentWorkoutRoutineId = getCurrentWorkoutRoutineId();
   if (routineExercises.length) {
     if (currentWorkoutRoutineId && currentWorkoutRoutineId === routineId) {
-      updateCurrentWorkout(routineExercises);
+      updateCurrentWorkout(routineExercises, routineName);
     }
   }
 };

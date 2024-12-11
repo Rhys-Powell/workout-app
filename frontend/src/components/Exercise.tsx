@@ -16,7 +16,7 @@ const typedErrors: Errors = errors;
 
 export function Exercise() {
   const navigate = useNavigate();
-  const { getCurrentWorkoutExercises } = useWorkoutContext();
+  const { getCurrentWorkoutExercises, getCurrentWorkoutRoutineName } = useWorkoutContext();
   const memoizedGetCurrentWorkoutExercises = useCallback(getCurrentWorkoutExercises, [getCurrentWorkoutExercises]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState(false);
@@ -77,12 +77,15 @@ export function Exercise() {
   }
 
   return (
-    
     <div>
       <TabSelector changeActiveTab={setActiveIndex} />
       { error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
-        : isDataFetched ? <h1>{exercise?.name}</h1>
-        : <p>Loading...</p> 
+        : !isDataFetched ? <p>Loading...</p> 
+        : currentExerciseOrder === -1 ? <h1>{exercise?.name}</h1>
+        : (<>
+              <p>{`Exercise ${currentExerciseOrder} of ${currentWorkoutExercises.length} in ${getCurrentWorkoutRoutineName()}`}</p>
+            <h1>{exercise?.name}</h1>
+          </>)
       }
       <ExerciseSets isActive={activeIndex === 0} />
       <ExerciseHistory isActive={activeIndex === 1} />

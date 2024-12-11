@@ -113,7 +113,7 @@ export default function Routines() {
         routines.length === 0 ? <p>No routines found</p> :
         routines.map(routine => (
           <div key={routine.id}>
-            <Link to={`${routine.id}`}>{routine.name}</Link>
+            <Link to={`${routine.id}?routineName=${routine.name}`}>{routine.name}</Link>
             <button onClick={() => deleteRoutine(routine.id)}>Delete</button>
           </div>
         ))

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
 import DataService from '../DataService';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
@@ -19,6 +19,7 @@ const typedErrors: Errors = errors;
 
 export default function Routine() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
   const [selectorActive, setSelectorActive] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -31,12 +32,17 @@ export default function Routine() {
   const userIdRef = useRef<string | undefined>(userId?.toString());  
   const { routineId } = useParams();
   const routineIdRef = useRef<string | undefined>(routineId);
+  const routineName = () => {
+    const queryString = location.search;
+    const params = new URLSearchParams(queryString);
+    return params.get('routineName') as string;
+  }
   const { getAccessTokenSilently } = useAuth0();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
   const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
-  const syncCurrentWorkout = useSyncCurrentWorkout(routineIdRef.current?.toString() ?? '', routineExercises);
+  const syncCurrentWorkout = useSyncCurrentWorkout(routineExercises, routineIdRef.current?.toString() ?? '', routineName() ?? '');
 
   useEffect(() => {
     async function getRoutineExercises() {
@@ -50,7 +56,6 @@ export default function Routine() {
         );
         setError(false);
         setIsDataFetched(true);
-        
         return data;
       } catch (error) {
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -63,7 +68,7 @@ export default function Routine() {
     }
 
     getRoutineExercises().then((value) => setRoutineExercises(value ?? []));
-  }, [memoizedDataService, memoizedGetAccessTokenSilently, syncCurrentWorkout]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently]);
 
   useEffect(() => {
     syncCurrentWorkout;
@@ -164,13 +169,14 @@ export default function Routine() {
 
   function beginWorkout() {
     const sortedExercises = routineExercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
-    updateCurrentWorkout(sortedExercises);
+    updateCurrentWorkout(sortedExercises, routineName());
     const firstExerciseId = sortedExercises[0].exerciseId;
     navigate(`/users/${userId}/exercises/${firstExerciseId}`)
   }
 
   return (
   <>
+    {<h1>{routineName()}</h1>}
     {!editMode && (
       error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
       : !isDataFetched ? <p>Loading...</p> 
