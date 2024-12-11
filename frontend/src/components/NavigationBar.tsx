@@ -25,12 +25,9 @@ export default function NavigationBar() {
   
   useEffect(() => {
     const currentUrl = location.pathname;
-    console.log("currentUrl", currentUrl);
     currentWorkoutExercises.forEach(exercise => {
       const url = `/users/${userId}/exercises/${exercise.exerciseId}`;
-      console.log("url", url);
       if (url === currentUrl) {
-        console.log("isOnWorkoutPage", isOnWorkoutPage);
         setIsOnWorkoutPage(true);
       } 
     })
