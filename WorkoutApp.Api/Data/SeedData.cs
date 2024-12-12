@@ -4,7 +4,7 @@ namespace WorkoutApp.Api.Data;
 
 public static class SeedData
 {
-    public static async Task SeedDatabaseAsync(WorkoutContext context)
+    public static async Task SeedDatabaseAsync(WorkoutAppDbContext context)
     {
         // Ensure the database is created
         await context.Database.EnsureCreatedAsync();

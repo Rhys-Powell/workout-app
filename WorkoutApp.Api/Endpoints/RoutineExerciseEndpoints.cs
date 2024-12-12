@@ -16,7 +16,7 @@ public static class RoutineExerciseEndpoints
         var group = app.MapGroup("api/users/{userId}/routines/{routineId}/exercises").WithParameterValidation();
 
         // GET api/users/{userId}/routines/{routineId}/exercises?includeDetails=true
-        group.MapGet("/", async (int userId, int routineId, bool includeDetails, WorkoutContext dbContext) =>
+        group.MapGet("/", async (int userId, int routineId, bool includeDetails, WorkoutAppDbContext dbContext) =>
         {
             var routineExercises = await dbContext.RoutineExercise
                 .Where(re => re.RoutineId == routineId)
@@ -37,7 +37,7 @@ public static class RoutineExerciseEndpoints
             .RequireAuthorization();
 
         // POST api/users/{userId}/routines/{routineId}/exercises
-        group.MapPost("/", async (int userId, [FromQuery] int exerciseId, int routineId, WorkoutContext dbContext) =>
+        group.MapPost("/", async (int userId, [FromQuery] int exerciseId, int routineId, WorkoutAppDbContext dbContext) =>
         {
             //Validate routineId
             var routine = await dbContext.Routines.FindAsync(routineId);
@@ -72,7 +72,7 @@ public static class RoutineExerciseEndpoints
         }).RequireAuthorization();
 
         // DELETE api/users/{userId}/routines/{routineId}/exercises/{exerciseId}
-        group.MapDelete("/{exerciseId}", async (int routineId, int exerciseId, WorkoutContext dbContext) =>
+        group.MapDelete("/{exerciseId}", async (int routineId, int exerciseId, WorkoutAppDbContext dbContext) =>
         {
             await dbContext.RoutineExercise
                 .Where(re => re.RoutineId == routineId && re.ExerciseId == exerciseId)

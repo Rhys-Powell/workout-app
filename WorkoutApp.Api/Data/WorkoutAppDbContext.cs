@@ -3,7 +3,7 @@ using WorkoutApp.Api.Entities;
 
 namespace WorkoutApp.Api.Data;
 
-public class WorkoutContext(DbContextOptions<WorkoutContext> options)
+public class WorkoutAppDbContext(DbContextOptions<WorkoutAppDbContext> options)
     : DbContext(options)
 {
     public DbSet<Routine> Routines => Set<Routine>();
@@ -11,6 +11,8 @@ public class WorkoutContext(DbContextOptions<WorkoutContext> options)
     public DbSet<User> Users => Set<User>();
 
     public DbSet<RoutineExercise> RoutineExercise => Set<RoutineExercise>();
+
+    // public DbSet<Workout> Workouts => Set<Workout>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

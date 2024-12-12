@@ -9,7 +9,7 @@ public class OwnershipMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
 
-    public async Task InvokeAsync(HttpContext context, WorkoutContext dbContext)
+    public async Task InvokeAsync(HttpContext context, WorkoutAppDbContext dbContext)
     {
         // Check if the request is from the Auth0 machine-to-machine app or admin user, if so, allow. 
         if (context.Items["IsM2M"] as bool? == true || context.User.Claims.Any(c => c.Type == "permissions" && c.Value == "all"))

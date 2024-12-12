@@ -10,7 +10,7 @@ using WorkoutApp.Api.Data;
 
 namespace WorkoutApp.Api.Migrations
 {
-    [DbContext(typeof(WorkoutContext))]
+    [DbContext(typeof(DbContext))]
     [Migration("20240902071347_InitialCreateMySql")]
     partial class InitialCreateMySql
     {

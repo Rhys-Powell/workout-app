@@ -22,7 +22,7 @@ var password = builder.Configuration["MYSQL_ROOT_PASSWORD"];
 
 var connectionString = $"Server={server};Port={port};Database={database};User={user};Password={password};";
 
-builder.Services.AddDbContext<WorkoutContext>(
+builder.Services.AddDbContext<WorkoutAppDbContext>(
     dbContextOptions => dbContextOptions
         .UseMySql(connectionString, serverVersion)
 );
@@ -121,7 +121,7 @@ await app.MigrateDbAsync();
 // Seed the database
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<WorkoutContext>();
+    var context = scope.ServiceProvider.GetRequiredService<WorkoutAppDbContext>();
     await SeedData.SeedDatabaseAsync(context);
 }
 

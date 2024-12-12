@@ -10,7 +10,7 @@ using WorkoutApp.Api.Data;
 
 namespace WorkoutApp.Api.Migrations
 {
-    [DbContext(typeof(WorkoutContext))]
+    [DbContext(typeof(WorkoutAppDbContext))]
     [Migration("20240920011233_AddAuth0IdToUser")]
     partial class AddAuth0IdToUser
     {

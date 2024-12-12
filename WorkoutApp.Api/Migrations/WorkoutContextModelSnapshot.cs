@@ -9,8 +9,8 @@ using WorkoutApp.Api.Data;
 
 namespace WorkoutApp.Api.Migrations
 {
-    [DbContext(typeof(WorkoutContext))]
-    partial class WorkoutContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DbContext))]
+    partial class DbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

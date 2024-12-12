@@ -16,7 +16,7 @@ public static class RoutineEndpoints
         var group = app.MapGroup("api/users/{userId}/routines").WithParameterValidation();
 
         // GET api/users/{userId}/routines
-        group.MapGet("/", async (int userId, WorkoutContext dbContext) =>
+        group.MapGet("/", async (int userId, WorkoutAppDbContext dbContext) =>
         {
             var routines = await dbContext.Routines
                 .Where(ex => ex.UserId == userId)
@@ -28,7 +28,7 @@ public static class RoutineEndpoints
         }).RequireAuthorization();
 
         // GET api/users/{userId}/routines/{routineId}
-        group.MapGet("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
+        group.MapGet("/{routineId}", async (int userId, int routineId, WorkoutAppDbContext dbContext) =>
         {
             var routine = await dbContext.Routines
                 .Where(e => e.Id == routineId && e.UserId == userId)
@@ -40,7 +40,7 @@ public static class RoutineEndpoints
             .RequireAuthorization();
 
         // POST api/users/{userId}/routines
-        group.MapPost("/", async (int userId, RoutineDto newRoutine, WorkoutContext dbContext) =>
+        group.MapPost("/", async (int userId, RoutineDto newRoutine, WorkoutAppDbContext dbContext) =>
         {
             var routine = newRoutine.ToEntity();
 
@@ -51,7 +51,7 @@ public static class RoutineEndpoints
         }).RequireAuthorization();
 
         //PUT api/users/{userId}/routines/{routineId}
-        group.MapPut("/{routineId}", async (int userId, int routineId, RoutineDto updatedWorkout, WorkoutContext dbContext) =>
+        group.MapPut("/{routineId}", async (int userId, int routineId, RoutineDto updatedWorkout, WorkoutAppDbContext dbContext) =>
         {
             var existingRoutine = await dbContext.Routines
                 .FirstOrDefaultAsync(w => w.Id == routineId && w.UserId == userId);
@@ -70,7 +70,7 @@ public static class RoutineEndpoints
         }).RequireAuthorization();
 
         // PATCH api/users/{userId}/routines/{routineId}
-        group.MapPatch("/{routineId}", async (int routineId, [FromBody] ExerciseOrderUpdateDto[] itemsToUpdate, WorkoutContext dbContext) =>
+        group.MapPatch("/{routineId}", async (int routineId, [FromBody] ExerciseOrderUpdateDto[] itemsToUpdate, WorkoutAppDbContext dbContext) =>
         {
             var routineExercises = await dbContext.RoutineExercise
                 .Where(re => re.RoutineId == routineId)
@@ -115,7 +115,7 @@ public static class RoutineEndpoints
         }).RequireAuthorization();
 
         // DELETE api/users/{userId}/routines/{routineId}
-        group.MapDelete("/{routineId}", async (int userId, int routineId, WorkoutContext dbContext) =>
+        group.MapDelete("/{routineId}", async (int userId, int routineId, WorkoutAppDbContext dbContext) =>
         {
             await dbContext.Routines
                 .Where(e => e.Id == routineId && e.UserId == userId)
