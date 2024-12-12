@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C#: Workout.Api Debug",
+            "name": "C#: WorkoutApp.Api Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Workout.Api/Workout.Api.csproj"
+            "projectPath": "${workspaceFolder}/WorkoutApp.Api/WorkoutApp.Api.csproj"
         },
         {
             "name": "Frontend Debug on Chrome",
