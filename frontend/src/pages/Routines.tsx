@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import DataService from '../DataService';
 import { Routine } from '../types/Routine';
 import { Link } from 'react-router-dom';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
-import { useCurrentUser } from '../context/UseCurrentUserHook';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWorkoutContext } from '../context/UseWorkoutContextHook';
+import { getContextItem } from '../helpers/getContextItem';
 
 const typedErrors: Errors = errors;
 
@@ -15,14 +15,11 @@ export default function Routines() {
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const [error, setError] = useState(false);
-  // Calling useCurrentUser() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()is still seen as a change which will trigger the useEffect in an infinite loop.
-  const { currentUser } = useCurrentUser();
-  const userId = currentUser?.id; 
-  const userIdRef = useRef<string | undefined>(userId?.toString()); 
+  const userId = getContextItem("currentUserId");
   const { getAccessTokenSilently } = useAuth0();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
-  const dataService = useMemo(() => DataService(), []);
+  const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
   const { getCurrentWorkoutRoutineId, removeCurrentWorkout } = useWorkoutContext();
 
@@ -30,7 +27,7 @@ export default function Routines() {
     async function getRoutines() {
       const token = await memoizedGetAccessTokenSilently();
       try {
-        const data: Routine[] = await dataService.getData(token, 'users/' + userIdRef.current + '/routines');
+        const data: Routine[] = await memoizedDataService.getData(token, 'users/' + userId + '/routines');
         setError(false);
         setIsDataFetched(true);
         return data;
@@ -40,7 +37,7 @@ export default function Routines() {
       }
     }
     getRoutines().then((value) => setRoutines(value ?? []));
-  }, [dataService, memoizedGetAccessTokenSilently]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently, userId]);
 
   useEffect(() => {
     checkForDeletedRoutine();
@@ -51,7 +48,7 @@ export default function Routines() {
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData(token, 'users/' + userId.toString() + '/routines', {}, { userId: userId.toString(), name: input.name });
+        const response = await memoizedDataService.postData(token, 'users/' + userId.toString() + '/routines', {}, { userId: userId.toString(), name: input.name });
         setRoutines((prevRoutines) => [...prevRoutines, response]);
       } catch (error) {
           console.error(error);
@@ -67,7 +64,7 @@ export default function Routines() {
     const token = await memoizedGetAccessTokenSilently();
     if (userId != null) {
       try {
-        await dataService.deleteData(token, 'users/' + userId + '/routines/' + routineId);
+        await memoizedDataService.deleteData(token, 'users/' + userId + '/routines/' + routineId);
       } catch (error) {
         console.error(error);
         setError(true);

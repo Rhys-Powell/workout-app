@@ -4,18 +4,17 @@ import LoginButton from './LoginButton';
 import SignupButton from './SignupButton';
 import LogoutButton from './LogoutButton';
 import ResumeWorkoutButton from './ResumeWorkoutButton';
-import { useCurrentUser } from '../context/UseCurrentUserHook';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 import { useEffect, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
+import { getContextItem } from '../helpers/getContextItem';
 
 export default function NavigationBar() {
   const { isAuthenticated } = useAuth0();
   const { getCurrentWorkoutExercises } = useWorkoutContext();
   const [currentWorkoutExercises, setCurrentWorkoutExercises] = useState<RoutineExercise[]>([]);
-  const { currentUser } = useCurrentUser();
-  const userId = currentUser?.id;
+  const userId = getContextItem("currentUserId"); 
   const [ isOnWorkoutPage, setIsOnWorkoutPage ] = useState(false);
 
   useEffect(() => {

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Exercise } from '../types/Exercise';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
-import { useCurrentUser } from '../context/UseCurrentUserHook';
+import { getContextItem } from '../helpers/getContextItem';
 import DataService from '../DataService';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -14,21 +14,18 @@ export default function Exercises() {
   const [input, setInput] = useState({ name: '' });
   const [createMode, setCreateMode] = useState(false);
   const [error, setError] = useState(false);
-   // Calling useCurrentUser() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()is still seen as a change which will trigger the useEffect in an infinite loop.
-  const { currentUser }= useCurrentUser(); 
-  const userId = currentUser?.id;
-  const userIdRef = useRef<string | undefined>(userId?.toString()); 
+  const userId = getContextItem("currentUserId");
   const { getAccessTokenSilently } = useAuth0();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
-  const dataService = useMemo(() => DataService(), []);
+  const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     async function getExercises() {
       const token = await memoizedGetAccessTokenSilently();
       try {
-        const response = await dataService.getData(token, 'users/' + userIdRef.current + '/exercises');
+        const response = await memoizedDataService.getData(token, 'users/' + userId + '/exercises');
         setError(false);
         if (Array.isArray(response)) {
           setIsDataFetched(true);
@@ -41,16 +38,15 @@ export default function Exercises() {
         setError(true);
       }
     }
-
     getExercises().then((value) => setExercises(value ?? []));
-  }, [dataService, memoizedGetAccessTokenSilently]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently, userId]);
 
   async function createExercise() {
     const token = await memoizedGetAccessTokenSilently();
     setCreateMode(false);
     if (userId != null) {
       try {
-        const response = await dataService.postData(token, 'users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
+        const response = await memoizedDataService.postData(token, 'users/' + userId.toString() + '/exercises', {}, { userId: userId.toString(), name: input.name });
         setExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
         console.error(error);
@@ -66,7 +62,7 @@ export default function Exercises() {
     const token = await memoizedGetAccessTokenSilently();
     if (userId != null) {
       try {
-        await dataService.deleteData(token, 'users/' + userId + '/exercises/' + exerciseId);
+        await memoizedDataService.deleteData(token, 'users/' + userId + '/exercises/' + exerciseId);
       } catch (error) {
         console.error(error);
         setError(true);

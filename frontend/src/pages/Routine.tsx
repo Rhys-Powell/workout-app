@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
 import DataService from '../DataService';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -7,7 +7,7 @@ import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Modal from '../components/Modal';
-import { useCurrentUser } from '../context/UseCurrentUserHook';
+import { getContextItem } from '../helpers/getContextItem';
 import './Routine.scoped.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import tooltip from '../../metadata/tooltips.json';
@@ -25,31 +25,31 @@ export default function Routine() {
   const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<Exercise[]>([]);
   const [error, setError] = useState(false);
-  // Calling useCurrentUser()/useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useCurrentUser()/useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
-  const { currentUser }= useCurrentUser(); 
+  // Calling useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
+  const params = useParams();
+  const memoizedRoutineId = useMemo(() => params.routineId, [params.routineId]);
   const { updateCurrentWorkout } = useWorkoutContext();
-  const userId = currentUser?.id;
-  const userIdRef = useRef<string | undefined>(userId?.toString());  
-  const { routineId } = useParams();
-  const routineIdRef = useRef<string | undefined>(routineId);
+  const userId = getContextItem("currentUserId");
+  
   const routineName = () => {
     const queryString = location.search;
     const params = new URLSearchParams(queryString);
     return params.get('routineName') as string;
   }
+
   const { getAccessTokenSilently } = useAuth0();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
   const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
-  const syncCurrentWorkout = useSyncCurrentWorkout(routineExercises, routineIdRef.current?.toString() ?? '', routineName() ?? '');
+  const syncCurrentWorkout = useSyncCurrentWorkout(routineExercises, memoizedRoutineId?.toString() ?? '', routineName() ?? '');
 
   useEffect(() => {
     async function getRoutineExercises() {
       const token = await memoizedGetAccessTokenSilently();
       try {
         const data: RoutineExercise[] = await memoizedDataService.getData(token, 
-          'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises',
+          'users/' + userId + '/routines/' + memoizedRoutineId + '/exercises',
           {
             includeDetails: 'true',
           },
@@ -58,17 +58,13 @@ export default function Routine() {
         setIsDataFetched(true);
         return data;
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
     }
 
     getRoutineExercises().then((value) => setRoutineExercises(value ?? []));
-  }, [memoizedDataService, memoizedGetAccessTokenSilently]);
+  }, [memoizedDataService, memoizedGetAccessTokenSilently, memoizedRoutineId, userId]);
 
   useEffect(() => {
     syncCurrentWorkout;
@@ -80,31 +76,23 @@ export default function Routine() {
       const data: Exercise[] = await memoizedDataService.getData(token, 'users/' + userId + '/exercises');
       return data;
     } catch (error) {
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        console.error('Failed to fetch data:', error);
-        setError(true);
-      } else {
-        console.error(error);
-      }
+      console.error(error);
+      setError(true);
     }
   }
 
   async function addRoutineExercise(selectedId: number) {
     const token = await memoizedGetAccessTokenSilently();
-    if (userIdRef.current != null && selectedId > -1) {
+    if (userId != null && selectedId > -1) {
       const exerciseId: string = selectedId.toString();
       try {
         const response = await memoizedDataService.postData(token, 
-          'users/' + userIdRef.current + '/routines/' + routineIdRef.current + '/exercises', { 'exerciseId': exerciseId }
+          'users/' + userId + '/routines/' + memoizedRoutineId+ '/exercises', { 'exerciseId': exerciseId }
         );
         setRoutineExercises((prevExercises) => [...prevExercises, response]);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
       setError(false);
     } else {
@@ -116,15 +104,11 @@ export default function Routine() {
     const token = await memoizedGetAccessTokenSilently();  
     if (userId != null) {
       try {
-        await memoizedDataService.deleteData(token, 'users/' + userId + '/routines/' + routineId + '/exercises/' + exerciseId);
+        await memoizedDataService.deleteData(token, 'users/' + userId + '/routines/' + memoizedRoutineId + '/exercises/' + exerciseId);
         setError(false);
       } catch (error) {
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.error('Failed to fetch data:', error);
-          setError(true);
-        } else {
-          console.error(error);
-        }
+        console.error(error);
+        setError(true);
       }
       setRoutineExercises((prevExercises) => prevExercises.filter((e) => e.id !== routineExerciseId));
       setError(false);
@@ -149,7 +133,7 @@ export default function Routine() {
       itemsToUpdate.unshift({"ExerciseId": item.exerciseId, "NewExerciseOrder": item.exerciseOrder});
     });
     const token = await memoizedGetAccessTokenSilently();
-    memoizedDataService.patchData(token, 'users/' + userId + '/routines/' + routineId, undefined, 
+    memoizedDataService.patchData(token, 'users/' + userId + '/routines/' + memoizedRoutineId, undefined, 
       itemsToUpdate);
     setEditMode(false);
   }
