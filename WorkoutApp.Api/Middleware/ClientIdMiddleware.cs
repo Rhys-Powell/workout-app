@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using WorkoutApp.Api.Helpers;
 
 namespace WorkoutApp.Api.Middleware;
 
@@ -22,34 +23,33 @@ public class ClientIdMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Get the access token from the Authorization header
-        var accessToken = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Authorization token is missing");
-            return;
-        }
-        try
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(accessToken);
+        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-            // Check the 'azp' claim to determine if it's an M2M client
-            var clientId = token?.Claims.FirstOrDefault(c => c.Type == "azp")?.Value;
-
-            if (clientId == _m2mClientId)
-            {
-                context.Items["IsM2M"] = true;
-            }
-        }
-        catch (Exception ex)
+        // Validate the access token
+        var tokenValidator = new TokenValidator();
+        var validationResult = await tokenValidator.ValidateToken(context);
+        if (validationResult != null)
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync($"Error parsing token: {ex.Message}");
-            return;
-        }
+            var jwtToken = validationResult as JwtSecurityToken;
+            if (jwtToken != null)
+                try
+                {
+                    // Check the 'azp' claim to determine if it's an M2M client
+                    var clientId = jwtToken.Claims.FirstOrDefault(c => c.Type == "azp")?.Value;
 
-        await _next(context);
+                    if (clientId == _m2mClientId)
+                    {
+                        context.Items["IsM2M"] = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await context.Response.WriteAsync($"Error parsing token: {ex.Message}");
+                    return;
+                }
+
+            await _next(context);
+        }
     }
 }
