@@ -1,8 +1,8 @@
-This is a learning project implementing: 
-- a minimal REST web api in Asp.Net Core;
+This is a project implementing: 
+- a minimal REST web API in Asp.Net Core;
 - a MySql DB;
 - a React & Typescript front-end with Vite.
-- API and database have been deployed to separate Fly.io apps, and the front-end to Netlify.
+- the API and database have been deployed as separate Fly.io apps, and the front-end deployed to Netlify.
 
 The app is a workout app where a user can CRUD their own exercises, routines, and then populate the routines with exercises. You can drag and drop to rearrange the order of exercises within a routine. This order is not currently saved but I will add this feature. Other user data is persisted in a MySql database though.
 
