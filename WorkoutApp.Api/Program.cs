@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
@@ -79,7 +78,7 @@ app.UseAuthorization();
 
 app.UseMiddleware<ClientIdMiddleware>();
 app.UseWhen(context =>
-    !context.Request.Path.Equals("/api/users/auth", StringComparison.OrdinalIgnoreCase) &&
+    !context.Request.Path.Value!.StartsWith("/api/users/auth", StringComparison.OrdinalIgnoreCase) &&
     !context.Request.Path.Equals("/api/health", StringComparison.OrdinalIgnoreCase), appBuilder =>
 {
     appBuilder.UseMiddleware<OwnershipMiddleware>();
