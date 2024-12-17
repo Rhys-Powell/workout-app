@@ -69,6 +69,10 @@ button:focus-visible {
   background-color: lightgray;
 }
 
+.invalid-input {
+  border: 1px solid red;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

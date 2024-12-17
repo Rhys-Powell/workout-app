@@ -11,8 +11,8 @@ public class WorkoutAppDbContext(DbContextOptions<WorkoutAppDbContext> options)
     public DbSet<User> Users => Set<User>();
 
     public DbSet<RoutineExercise> RoutineExercise => Set<RoutineExercise>();
-
-    // public DbSet<Workout> Workouts => Set<Workout>();
+    public DbSet<Workout> Workouts => Set<Workout>();
+    public DbSet<Set> Sets => Set<Set>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

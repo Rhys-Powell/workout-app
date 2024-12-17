@@ -114,7 +114,8 @@ app.MapUserEndpoints();
 app.MapRoutineEndpoints();
 app.MapRoutineExercisesEndpoints();
 app.MapHealthEndpoints();
-
+app.MapWorkoutEndpoints();
+app.MapSetEndpoints();
 await app.MigrateDbAsync();
 
 // Seed the database

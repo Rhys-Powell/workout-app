@@ -3,7 +3,7 @@ import ExerciseSets from './ExerciseSets';
 import ExerciseHistory from './ExerciseHistory';
 import Timer from './Timer';
 import type { Exercise } from '../types/Exercise';
-import {useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DataService from '../DataService';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
@@ -17,7 +17,6 @@ const typedErrors: Errors = errors;
 export function Exercise() {
   const navigate = useNavigate();
   const { getCurrentWorkoutExercises, getCurrentWorkoutRoutineName } = useWorkoutContext();
-  const memoizedGetCurrentWorkoutExercises = useCallback(getCurrentWorkoutExercises, [getCurrentWorkoutExercises]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState(false);
   const [exercise, setExercise] = useState<Exercise>();
@@ -50,14 +49,13 @@ export function Exercise() {
   }, [memoizedDataService, memoizedExerciseId, memoizedGetAccessTokenSilently, userId]);
 
   useEffect(() => {
-      const routineExercises = memoizedGetCurrentWorkoutExercises();
+      const routineExercises = getCurrentWorkoutExercises();
       setCurrentWorkoutExercises(routineExercises);
       const currentExercise = routineExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
       if (currentExercise) {
         setCurrentExerciseOrder(currentExercise.exerciseOrder);
       }
-      
-    }, [memoizedExerciseId, memoizedGetCurrentWorkoutExercises]);
+    }, [memoizedExerciseId, getCurrentWorkoutExercises]);
 
   function goToPrevExercise() {
     const prevExercises = currentWorkoutExercises.filter(exercise => exercise.exerciseOrder < currentExerciseOrder);

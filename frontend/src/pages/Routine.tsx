@@ -12,8 +12,9 @@ import './Routine.scoped.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import tooltip from '../../metadata/tooltips.json';
 import { Tooltip } from 'react-tooltip';
-import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 import { useSyncCurrentWorkout } from '../context/UseSyncCurrentWorkout';
+import { Workout} from '../types/Workout';
+import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 
 const typedErrors: Errors = errors;
 
@@ -28,7 +29,6 @@ export default function Routine() {
   // Calling useParams() creates a new object every time the component is rendered. If the params are declared dependencies of the useEffect below and not made refs, even if the values of the params don't change, the new object returned by useParams() is still seen as a change which will trigger the useEffect in an infinite loop.
   const params = useParams();
   const memoizedRoutineId = useMemo(() => params.routineId, [params.routineId]);
-  const { updateCurrentWorkout } = useWorkoutContext();
   const userId = getContextItem("currentUserId");
   
   const routineName = () => {
@@ -43,6 +43,7 @@ export default function Routine() {
   const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
   const syncCurrentWorkout = useSyncCurrentWorkout(routineExercises, memoizedRoutineId?.toString() ?? '', routineName() ?? '');
+  const { updateCurrentWorkout } = useWorkoutContext();
 
   useEffect(() => {
     async function getRoutineExercises() {
@@ -117,6 +118,23 @@ export default function Routine() {
     }
   }
 
+  async function addWorkout() {
+    const token = await memoizedGetAccessTokenSilently();
+    if (userId != null) {
+      try {
+        // console.log("api call", userId);
+        const response = await memoizedDataService.postData(token, 'users/' + userId + '/workouts', {});
+        return response;
+      } catch (error) {
+        console.error(error);
+        setError(true);
+      }
+      setError(false);
+    } else {
+      console.error('User ID is null');
+    }
+  }
+
   function populateSelectorList() {
     getExercises().then((data) => setOptions((data as Exercise[]) ?? []));
   }
@@ -153,9 +171,13 @@ export default function Routine() {
 
   function beginWorkout() {
     const sortedExercises = routineExercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
-    updateCurrentWorkout(sortedExercises, routineName());
+    addWorkout().then((data: Workout) => {
+      updateCurrentWorkout(sortedExercises, routineName(), data?.id.toString());
+    }).catch(error => {
+      console.error(error)
+    });
     const firstExerciseId = sortedExercises[0].exerciseId;
-    navigate(`/users/${userId}/exercises/${firstExerciseId}`)
+    navigate(`/users/${userId}/exercises/${firstExerciseId}?refresh=true`)
   }
 
   return (
