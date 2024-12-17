@@ -29,9 +29,9 @@ export function Exercise() {
   const memoizedGetAccessTokenSilently = useCallback(getAccessTokenSilently, []);
   const memoizedDataService = useMemo(() => DataService(), []);
   const [isDataFetched, setIsDataFetched] = useState(false);
-  const [currentWorkoutExercises, setCurrentWorkoutExercises] = useState<RoutineExercise[] | []>([]);
   const [currentExerciseOrder, setCurrentExerciseOrder] = useState(-1);
-
+  const currentWorkoutExercises: RoutineExercise[] = getCurrentWorkoutExercises();
+  
   useEffect(() => {
     async function getExercise() {
       const token = await memoizedGetAccessTokenSilently();
@@ -49,13 +49,11 @@ export function Exercise() {
   }, [memoizedDataService, memoizedExerciseId, memoizedGetAccessTokenSilently, userId]);
 
   useEffect(() => {
-      const routineExercises = getCurrentWorkoutExercises();
-      setCurrentWorkoutExercises(routineExercises);
-      const currentExercise = routineExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
+      const currentExercise = currentWorkoutExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
       if (currentExercise) {
         setCurrentExerciseOrder(currentExercise.exerciseOrder);
       }
-    }, [memoizedExerciseId, getCurrentWorkoutExercises]);
+    }, [currentWorkoutExercises, memoizedExerciseId] );
 
   function goToPrevExercise() {
     const prevExercises = currentWorkoutExercises.filter(exercise => exercise.exerciseOrder < currentExerciseOrder);

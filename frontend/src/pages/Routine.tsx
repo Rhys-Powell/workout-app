@@ -177,7 +177,7 @@ export default function Routine() {
       console.error(error)
     });
     const firstExerciseId = sortedExercises[0].exerciseId;
-    navigate(`/users/${userId}/exercises/${firstExerciseId}?refresh=true`)
+    navigate(`/users/${userId}/exercises/${firstExerciseId}`);
   }
 
   return (
