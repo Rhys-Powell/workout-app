@@ -3,7 +3,7 @@ import ExerciseSets from './ExerciseSets';
 import ExerciseHistory from './ExerciseHistory';
 import Timer from './Timer';
 import type { Exercise } from '../types/Exercise';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import DataService from '../DataService';
 import errors from '../../metadata/errors.json';
 import Errors from '../types/errors';
@@ -11,12 +11,22 @@ import { getContextItem } from '../helpers/getContextItem';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 import { RoutineExercise } from '../types/RoutineExercises';
+import WorkoutTrackerTitle from './WorkoutTrackerTitle';
+import WorkoutNavButtons from './WorkoutNavButtons';
 
 const typedErrors: Errors = errors;
 
+export interface ExerciseProps {
+    currentExerciseOrder: number | null 
+    currentWorkoutExercises: RoutineExercise[] | []
+    exercise: Exercise | undefined
+    memoizedExerciseId: string | undefined
+    userId: string
+    workoutId: string | null
+}
+
 export function Exercise() {
-  const navigate = useNavigate();
-  const { getCurrentWorkoutExercises, getCurrentWorkoutRoutineName } = useWorkoutContext();
+  const { getCurrentWorkoutExercises, getCurrentWorkoutId } = useWorkoutContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState(false);
   const [exercise, setExercise] = useState<Exercise>();
@@ -31,45 +41,44 @@ export function Exercise() {
   const [isDataFetched, setIsDataFetched] = useState(false);
   const [currentExerciseOrder, setCurrentExerciseOrder] = useState(-1);
   const currentWorkoutExercises: RoutineExercise[] = getCurrentWorkoutExercises();
-  
+  const workoutId: string | null = getCurrentWorkoutId();
+
+  const props: ExerciseProps = { 
+    currentExerciseOrder, 
+    currentWorkoutExercises,
+    exercise,
+    memoizedExerciseId,
+    userId,
+    workoutId
+  }
+
   useEffect(() => {
-    async function getExercise() {
+    const getExercise = async () => {
       const token = await memoizedGetAccessTokenSilently();
       try {
-        const data: Exercise = await memoizedDataService.getData(token, 'users/' + userId + '/exercises/' + memoizedExerciseId);
-        setError(false);
-        setIsDataFetched(true);
-        return data;
+        await memoizedDataService.getData(token, 'users/' + userId + '/exercises/' + memoizedExerciseId)
+        .then((data: Exercise) => {
+          setError(false);
+          setIsDataFetched(true);
+          setExercise(data);
+        });
       } catch (error) {
         console.error(error);
         setError(true);
       }
     }
-    getExercise().then((value) => setExercise(value));
+    getExercise();
   }, [memoizedDataService, memoizedExerciseId, memoizedGetAccessTokenSilently, userId]);
 
+  //Get the exerciseOrder for the current exercise in the workout
   useEffect(() => {
-      const currentExercise = currentWorkoutExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
+    console.log("2nd useEffect triggered")
+    console.log("currentWorkoutExercises", currentWorkoutExercises);  
+    const currentExercise = currentWorkoutExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
       if (currentExercise) {
         setCurrentExerciseOrder(currentExercise.exerciseOrder);
       }
     }, [currentWorkoutExercises, memoizedExerciseId] );
-
-  function goToPrevExercise() {
-    const prevExercises = currentWorkoutExercises.filter(exercise => exercise.exerciseOrder < currentExerciseOrder);
-    if (prevExercises.length > 0) {
-      const prevExercise = prevExercises.sort((a, b) => b.exerciseOrder - a.exerciseOrder)[0];
-      navigate(`/users/${userId}/exercises/${prevExercise.exerciseId}`);
-    }
-  }
-
-  function goToNextExercise() {
-    const nextExercises = currentWorkoutExercises.filter(exercise => exercise.exerciseOrder > currentExerciseOrder);
-    if (nextExercises.length > 0) {
-      const nextExercise = nextExercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder)[0];
-      navigate(`/users/${userId}/exercises/${nextExercise.exerciseId}`);
-    }
-  }
 
   return (
     <div>
@@ -77,19 +86,13 @@ export function Exercise() {
       { error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
         : !isDataFetched ? <p>Loading...</p> 
         : currentExerciseOrder === -1 ? <h1>{exercise?.name}</h1>
-        : (<>
-              <p>{`Exercise ${currentExerciseOrder} of ${currentWorkoutExercises.length} in ${getCurrentWorkoutRoutineName()}`}</p>
-            <h1>{exercise?.name}</h1>
-          </>)
+        : <WorkoutTrackerTitle {...props}/>
       }
-      <ExerciseSets isActive={activeIndex === 0} />
+      <ExerciseSets isActive={activeIndex === 0} {...props}/>
       <ExerciseHistory isActive={activeIndex === 1} />
-      {currentExerciseOrder !== -1 && (
-        <>
-          <button disabled={currentExerciseOrder <= 1} onClick={() => goToPrevExercise()}>Previous exercise</button>
-          <button disabled={currentExerciseOrder >= currentWorkoutExercises.length} onClick={() => goToNextExercise()}>Next exercise</button>
-        </>
-      )}
+      {currentExerciseOrder !== -1 && 
+        <WorkoutNavButtons {...props}/>
+      }
       <Timer />
     </div>
   );

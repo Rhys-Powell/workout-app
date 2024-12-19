@@ -122,7 +122,6 @@ export default function Routine() {
     const token = await memoizedGetAccessTokenSilently();
     if (userId != null) {
       try {
-        // console.log("api call", userId);
         const response = await memoizedDataService.postData(token, 'users/' + userId + '/workouts', {});
         return response;
       } catch (error) {
@@ -171,13 +170,15 @@ export default function Routine() {
 
   function beginWorkout() {
     const sortedExercises = routineExercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
-    addWorkout().then((data: Workout) => {
-      updateCurrentWorkout(sortedExercises, routineName(), data?.id.toString());
-    }).catch(error => {
-      console.error(error)
+    addWorkout()
+      .then((data: Workout) => {
+        updateCurrentWorkout(sortedExercises, routineName(), data?.id.toString())})
+      .then(() => {
+        const firstExerciseId = sortedExercises[0].exerciseId;
+        navigate(`/users/${userId}/exercises/${firstExerciseId}`);
+      }).catch(error => {
+        console.error(error)
     });
-    const firstExerciseId = sortedExercises[0].exerciseId;
-    navigate(`/users/${userId}/exercises/${firstExerciseId}`);
   }
 
   return (
