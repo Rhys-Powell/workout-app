@@ -26,10 +26,6 @@ export default function ExerciseSets({ isActive, ...props}: ExerciseSetProps) {
     restTimeDuration: '' 
   });
 
-  if (!props.currentExerciseOrder || !props.userId || !props.memoizedExerciseId || !props.workoutId) {
-    throw new Error("CurrentExerciseOrder, userId, exerciseId, or workoutId prop not available in ExerciseSets component");
-  }
-  
   const { currentExerciseOrder, userId, memoizedExerciseId, workoutId } = props;
 
   const [isInvalid, setIsInvalid] = useState(false);
@@ -42,13 +38,15 @@ export default function ExerciseSets({ isActive, ...props}: ExerciseSetProps) {
   useEffect(() => {
     const getSets = async () =>{
       const token = await memoizedGetAccessTokenSilently();
-      try {
-        await memoizedDataService.getData(token, 'users/' + userId + '/workouts/' + workoutId +'/exercises/' + memoizedExerciseId + '/sets'
-        ).then((data: ExerciseSet[]) => {
-          setExerciseSets(data);
-        });
-      } catch (error) {
-        console.error(error);
+      if (workoutId != null) {
+        try {
+          await memoizedDataService.getData(token, 'users/' + userId + '/workouts/' + workoutId +'/exercises/' + memoizedExerciseId + '/sets'
+          ).then((data: ExerciseSet[]) => {
+            setExerciseSets(data);
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
     getSets();

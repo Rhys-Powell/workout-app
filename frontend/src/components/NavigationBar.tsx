@@ -9,6 +9,7 @@ import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 import { useEffect, useState } from 'react';
 import { RoutineExercise } from '../types/RoutineExercises';
 import { getContextItem } from '../helpers/getContextItem';
+import EndWorkoutButton from './EndWorkoutButton';
 
 export default function NavigationBar() {
   const { isAuthenticated } = useAuth0();
@@ -54,6 +55,11 @@ export default function NavigationBar() {
           <ResumeWorkoutButton url={`/users/${userId}/exercises/${currentWorkoutExercises[0].exerciseId}`} />
         </div>
       }
+      {currentWorkoutExercises.length > 0 && (
+        <div className="navbar-item">
+          <EndWorkoutButton />
+        </div>
+      )}
       {!isAuthenticated && (
         <div className="navbar-item">
           <LoginButton />
