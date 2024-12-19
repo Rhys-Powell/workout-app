@@ -19,7 +19,7 @@ public static class SetEndpoints
         group.MapGet("/", async (int userId, int workoutId, int exerciseId, WorkoutAppDbContext dbContext) =>
         {
             var sets = await dbContext.Sets
-                .Where(ex => ex.UserId == userId && ex.ExerciseId == exerciseId)
+                .Where(ex => ex.UserId == userId && ex.ExerciseId == exerciseId && ex.WorkoutId == workoutId)
                 .Select(set => set.ToDto())
                 .AsNoTracking()
                 .ToListAsync();
