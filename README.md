@@ -1,4 +1,4 @@
-N.B. The core functionality is now present and I'll be adding responsive styling/layout to improve the appeal and usability.  
+** N.B. The core functionality is now present and I'll be adding responsive styling/layout to improve the appeal and usability.**  
 
 This is a project implementing: 
 - a minimal REST web API in Asp.Net Core;
