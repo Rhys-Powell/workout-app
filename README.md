@@ -7,7 +7,7 @@ This is a project implementing:
 The app is a workout app where a user can CRUD their own exercises, routines, and then populate the routines with exercises. You can drag and drop to rearrange the order of exercises within a routine. 
 
 It features:
-- Continuous deployment of API via GitHub Actions workflow, and frontend via Netlify integration with Github repo;
+- Continuous deployment of API via GitHub Actions workflow, and frontend via Netlify integration with the Github repo;
 - Auth0 2.0 authentication and authorization for login and requests to my API endpoints;
 - Custom middleware to address a top OWASP security vulnerability, namely insecure direct object references (IDOR). It extracts the user id from the auth token in each http request and compares against the user id of the 'owner' of that requested resource to prevent an authenticated user from obtaining, destroying or altering another user's data.
 - Relatively complex state management achieved using just vanilla React (useEffect and useState). For instance a workout can be started, and then the routine that the workout is based on can be changed - for instance adding a workout to it and/or rearranging the exercise order - and those changes will be reflected in the current workout. 
@@ -18,6 +18,6 @@ The app is already deployed to https://workout-app-rwp.netlify.app and can be in
 Link to my Postman collection of API functional tests: https://www.postman.com/speeding-shadow-539881/workout-app-api-testing/collection/yjjlcfy/workout-app-functional-api-tests
 
 Major work still to be done:
-~~- The ability to start a workout and then record your progress through that workout in terms of sets and reps completed for each exercise.~~ Now complete.
+- ~~The ability to start a workout and then record your progress through that workout in terms of sets and reps completed for each exercise.~~ Now complete.
 - This only has boilerplate React + Vite project styling. Better styling will be added further down the track after I've got the functionality I want. Also this is a desktop app project so please view on a desktop. I haven't checked for mobile responsiveness.
 - Testing (unit testing, may also add some end-to-end automated tests)
