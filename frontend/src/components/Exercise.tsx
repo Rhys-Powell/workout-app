@@ -72,8 +72,6 @@ export function Exercise() {
 
   //Get the exerciseOrder for the current exercise in the workout
   useEffect(() => {
-    console.log("2nd useEffect triggered")
-    console.log("currentWorkoutExercises", currentWorkoutExercises);  
     const currentExercise = currentWorkoutExercises.find((routineExercise) => routineExercise.exerciseId.toString() === memoizedExerciseId);
       if (currentExercise) {
         setCurrentExerciseOrder(currentExercise.exerciseOrder);
