@@ -13,6 +13,7 @@ import { useWorkoutContext } from '../context/UseWorkoutContextHook';
 import { RoutineExercise } from '../types/RoutineExercises';
 import WorkoutTrackerTitle from './WorkoutTrackerTitle';
 import WorkoutNavButtons from './WorkoutNavButtons';
+import './Exercise.scoped.css';
 
 const typedErrors: Errors = errors;
 
@@ -80,33 +81,44 @@ export function Exercise() {
 
   return (
     <div>
-      <TabSelector changeActiveTab={setActiveIndex} />
-      { error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
-        : !isDataFetched ? <p>Loading...</p> 
-        : currentExerciseOrder === -1 ? <h1>{exercise?.name}</h1>
-        : <WorkoutTrackerTitle {...props}/>
-      }
-      <ExerciseSets isActive={activeIndex === 0} {...props}/>
-      <ExerciseHistory isActive={activeIndex === 1} />
-      {currentExerciseOrder !== -1 && 
-        <WorkoutNavButtons {...props}/>
-      }
-      <Timer />
+      <TabSelector activeIndex={activeIndex} changeActiveTab={setActiveIndex} />
+      <div>
+        { error ? <p>{typedErrors.FAIL_TO_FETCH}</p> 
+          : !isDataFetched ? <p>Loading...</p> 
+          : currentExerciseOrder === -1 ? <h1>{exercise?.name}</h1>
+          : <WorkoutTrackerTitle {...props}/>
+        }
+         {currentExerciseOrder !== -1 && 
+          <WorkoutNavButtons {...props}/>
+        }
+        <ExerciseSets isActive={activeIndex === 0} {...props}/>
+        <ExerciseHistory isActive={activeIndex === 1} />
+        <Timer />
+      </div>
     </div>
   );
 }
 
-export function TabSelector({ changeActiveTab }: { changeActiveTab: (activeIndex: number) => void }) {
+export function TabSelector({ activeIndex, changeActiveTab }: { activeIndex: number, changeActiveTab: (activeIndex: number) => void }) {
+  
   function handleClick(activeIndex: number) {
     changeActiveTab(activeIndex);
   }
 
   return (
-    <>
-      <div>
-        <button onClick={() => handleClick(0)}>Sets</button>
-        <button onClick={() => handleClick(1)}>History</button>
-      </div>
-    </>
+    <div className="tab-container">
+      <div role="tab" className={activeIndex === 0 ? "tab" : "inactive tab"} onClick={() => handleClick(0)} onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleClick(0);
+        }
+      }}
+      tabIndex={0}>Sets</div>
+      <div role="tab" className={activeIndex === 1 ? "tab" : "inactive tab"} onClick={() => handleClick(1)} onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleClick(1);
+        }
+      }}
+      tabIndex={0}>History</div>
+    </div>
   );
 }

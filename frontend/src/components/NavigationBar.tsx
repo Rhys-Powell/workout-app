@@ -17,6 +17,7 @@ export default function NavigationBar() {
   const [currentWorkoutExercises, setCurrentWorkoutExercises] = useState<RoutineExercise[]>([]);
   const userId = getContextItem("currentUserId"); 
   const [ isOnWorkoutPage, setIsOnWorkoutPage ] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const exercises = getCurrentWorkoutExercises();
@@ -38,43 +39,50 @@ export default function NavigationBar() {
 
   return (
     <nav className="navigation-bar">
-      <div className="navbar-item">
-        <Link to="/">Home</Link>
-      </div>
-      <div className="navbar-item">
-        <Link to="/profile">Profile</Link>
-      </div>
-      <div className="navbar-item">
-        <Link to={`/users/${userId}/exercises`}>Exercises</Link>
-      </div>
-      <div className="navbar-item">
-        <Link to={`/users/${userId}/routines`}>Routines</Link>
-      </div>
-      {currentWorkoutExercises.length > 0 && !isOnWorkoutPage &&
-        <div className="navbar-item">
-          <ResumeWorkoutButton url={`/users/${userId}/exercises/${currentWorkoutExercises[0].exerciseId}`} />
-        </div>
-      }
-      {currentWorkoutExercises.length > 0 && (
-        <div className="navbar-item">
-          <EndWorkoutButton />
-        </div>
-      )}
-      {!isAuthenticated && (
-        <div className="navbar-item">
-          <LoginButton />
-        </div>
-      )}
-      {!isAuthenticated && (
-        <div className="navbar-item">
-          <SignupButton />
-        </div>
-      )}
-      {isAuthenticated && (
-        <div className="navbar-item">
-          <LogoutButton />
-        </div>
-      )}
+      <button className="menu" onClick={() => {setMenuOpen(!menuOpen)}}>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul className={menuOpen ? "menu-open" : ""}>
+        <li className="navbar-item">
+          <Link to="/">Home</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to="/profile">Profile</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to={`/users/${userId}/exercises`}>Exercises</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to={`/users/${userId}/routines`}>Routines</Link>
+        </li>
+        {currentWorkoutExercises.length > 0 && !isOnWorkoutPage &&
+          <li className="navbar-item">
+            <ResumeWorkoutButton url={`/users/${userId}/exercises/${currentWorkoutExercises[0].exerciseId}`} />
+          </li>
+        }
+        {currentWorkoutExercises.length > 0 && (
+          <li className="navbar-item">
+            <EndWorkoutButton />
+          </li>
+        )}
+        {!isAuthenticated && (
+          <li className="navbar-item">
+            <LoginButton />
+          </li>
+        )}
+        {!isAuthenticated && (
+          <li className="navbar-item">
+            <SignupButton />
+          </li>
+        )}
+        {isAuthenticated && (
+          <li className="navbar-item">
+            <LogoutButton />
+          </li>
+        )}
+      </ul>
     </nav>
   );
 }

@@ -12,9 +12,11 @@ export default function Timer() {
 
   return (
     <div className="timer">
-      <p>{mode === 'countDown' ? 'Countdown' : 'Stopwatch'}</p>
+      <div className="timer-header">
+        <h2 className="timer-title">{mode === 'countDown' ? 'Countdown' : 'Stopwatch'}</h2>
+        <button className="change-mode-button" onClick={toggleMode}>Switch mode</button>
+      </div>
       {mode === 'countDown' ? <Countdown /> : <Stopwatch />}
-      <button onClick={toggleMode}>Change mode</button>
     </div>
   );
 }

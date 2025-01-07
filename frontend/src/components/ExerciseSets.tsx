@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { ExerciseSet } from "../types/ExerciseSet";
 import CompletedSets from "./CompletedSets";
 import { ExerciseProps } from "./Exercise";
+import './ExerciseSets.scoped.css';
 
 interface FormData {
   reps: number;
@@ -113,30 +114,36 @@ export default function ExerciseSets({ isActive, ...props}: ExerciseSetProps) {
   return (
     <>
       {isActive && currentExerciseOrder !== -1 && (
-        <>
+        <div >
           <h2>Exercise Sets</h2>
-            <form onSubmit={handleSubmit} method="POST">
-              <div>
+          <form onSubmit={handleSubmit} method="POST" className="exercise-sets-form">
+            <div className="form-col">
+              <div className="form-field">
                 <label htmlFor="reps">Reps</label>
-                <input type="number" name="reps" placeholder="Reps" min="1" value={formData.reps} onChange={handleChange}></input>
+                <input type="number" name="reps" min="1" max="9999" value={formData.reps} onChange={handleChange}></input>
               </div>
-              <div>  
-                <label htmlFor="weightKg">Weight</label>
-                <input type="number" name="weightKg" placeholder="Weight (kg)" min="0" value={formData.weightKg} onChange={handleChange}></input>
+              <div className="form-field">
+                <label htmlFor="weightKg">Weight (kg)</label>
+                <input type="number" name="weightKg" min="0" max="9999"value={formData.weightKg} onChange={handleChange}></input>
               </div>
-              <div>
-                <p>Rest Time</p>
-                <label htmlFor="restTimeMins">Mins</label>
+             </div> 
+            <div className="form-col">
+              <p>Rest Time</p>
+              <div className="form-field">
+                <label htmlFor="restTimeMins">Minutes</label>
                 <input type="number" name="restTimeMins" value={formData.restTimeMins} min="0" max="59"
                 className={isInvalid ? 'invalid-input' : ''} onChange={handleRestTimeChange}></input>
-                <label htmlFor="restTimeSecs">Secs</label>
+              </div>
+              <div className="form-field">
+                <label htmlFor="restTimeSecs">Seconds</label>
                 <input type="number" name="restTimeSecs" value={formData.restTimeSecs} min="0" max="59" 
                 className={isInvalid ? 'invalid-input' : ''} onChange={handleRestTimeChange}></input>
               </div>
-              <button disabled={isInvalid} type="submit">Finish set</button>
-            </form>
-            <CompletedSets exerciseSets={exerciseSets}/>
-        </>
+            </div>
+            <button className="finish-set-button" disabled={isInvalid} type="submit">Finish set</button>
+          </form>
+          <CompletedSets exerciseSets={exerciseSets}/>
+        </div>
       )}
     </>
   );

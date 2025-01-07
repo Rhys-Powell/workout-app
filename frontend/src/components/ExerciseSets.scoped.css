@@ -1,0 +1,26 @@
+.exercise-sets-form {
+  display: flex;
+  justify-content: center;
+  align-items: last baseline;  
+}
+
+.form-field {
+  display: flex;
+  justify-content: space-between; 
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.finish-set-button {
+    align-self: center;
+}
+
+@media (max-width: 500px) {
+ .exercise-sets-form {
+    flex-direction: column;
+    align-items: center;
+ }   
+}

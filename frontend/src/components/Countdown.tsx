@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinus, faPlay, faPlus, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faMinus, faPlay, faPlus, faStop, faUndo } from '@fortawesome/free-solid-svg-icons';
 import './Countdown.scoped.css';
 import SetTimer from './SetTimer';
 
@@ -76,8 +76,8 @@ export default function Countdown() {
         <SetTimer count={count} onValueChange={handleCountChange} />
       ) : (
         <div className="countdown">
-          <button onClick={resetCountdown}>Reset</button>
           <button onClick={changeTimerDuration}>Choose duration</button>
+          <button onClick={resetCountdown}><FontAwesomeIcon icon={faUndo}></FontAwesomeIcon></button>
           <button onClick={incrementCount}>
             <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
           </button>
@@ -85,7 +85,7 @@ export default function Countdown() {
           <button onClick={decrementCount}>
             <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
           </button>
-          <button onClick={startStopTimer}>
+          <button className="play-button" onClick={startStopTimer}>
             {timerStarted ? <FontAwesomeIcon icon={faStop} /> : <FontAwesomeIcon icon={faPlay} />}
           </button>
         </div>

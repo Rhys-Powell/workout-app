@@ -1,4 +1,8 @@
+.timer-title {
+  display: inline;
+}
+
 .timer {
-  display: flex;
-  flex-direction: row;
+  padding: 2rem;
+  background-color: var(--alternate-bg-color);
 }

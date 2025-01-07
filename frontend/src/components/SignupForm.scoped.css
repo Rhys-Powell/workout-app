@@ -1,17 +1,12 @@
-form {
+.input-wrapper {
+    position: relative;
+}
+
+.signup-form {
     display: flex;
     flex-direction: column;
-    padding: 2em;
+    padding: 2rem;
     min-height: 200px;
     justify-content: space-between;
     align-items: start;
-}
-
-input {
-    margin-left: 2em;
-    margin-bottom: 2em;
-}
-
-.input-wrapper {
-    position: relative;
 }
