@@ -1,3 +1,4 @@
 {
-  "FAIL_TO_FETCH": "Failed to fetch data."
+  "FAIL_TO_FETCH": "Failed to fetch data.",
+  "USER_NOT_FOUND": "User could not be found. Please contact support."
 }
