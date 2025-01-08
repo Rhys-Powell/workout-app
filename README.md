@@ -1,9 +1,7 @@
-**N.B. The core functionality is now present and I'll be adding responsive styling/layout to improve the appeal and usability.**  
-
 This is a project implementing: 
 - a minimal REST web API in Asp.Net Core;
 - a MySql DB;
-- a React & Typescript front-end with Vite.
+- a basically styled but responsive React & Typescript front-end with Vite.
 - the API and database have been deployed as separate Fly.io apps, and the front-end deployed to Netlify.
 
 The app is a workout app where a user can CRUD their own exercises, routines, and then populate the routines with exercises. You can drag and drop to rearrange the order of exercises within a routine. 
@@ -21,5 +19,5 @@ Link to my Postman collection of API functional tests: https://www.postman.com/s
 
 Major work still to be done:
 - ~~The ability to start a workout and then record your progress through that workout in terms of sets and reps completed for each exercise.~~ Now complete.
-- This only has boilerplate React + Vite project styling currently - responsive styling to come.
+- ~~This only has boilerplate React + Vite project styling currently - responsive styling to come.~~
 - Testing (unit testing, may also add some end-to-end automated tests)
