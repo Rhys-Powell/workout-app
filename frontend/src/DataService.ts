@@ -49,7 +49,7 @@ const DataService = () => {
       const error: FetchError = createError(response);
       throw error;      
     } 
-    return response.json(); 
+    return responseBody; 
   };    
 
   const patchData = async (token: string,endpoint: string, params: { [key: string]: string } = {}, data?: object) => {
@@ -67,7 +67,7 @@ const DataService = () => {
       const error: FetchError = createError(response);
       throw error;      
     } 
-    return response.json(); 
+    return responseBody; 
   };
 
   const deleteData = async (token: string, endpoint: string, params: { [key: string]: string } = {}) => {
@@ -98,7 +98,7 @@ const DataService = () => {
       const error: FetchError = createError(response);
       throw error;      
     } 
-    return response.json(); 
+    return responseBody; 
   };
 
 return {
