@@ -21,8 +21,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - working-directory: ./playwright
-    - name: Install dependencies
+    - name: Install dependencies, playwright and run tests
+      working-directory: ./playwright  
       run: | 
         npm ci
         npx playwright install --with-deps
