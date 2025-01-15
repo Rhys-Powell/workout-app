@@ -45,6 +45,7 @@ export const CallbackPage = () => {
     if (error || isErrorOnFetch) {
       if (error) {
         setErrorMessage(error.message);
+        console.log(error);
       }
       setDisplayError(true);
     }

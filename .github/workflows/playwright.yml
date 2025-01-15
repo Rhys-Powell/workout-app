@@ -1,34 +1,37 @@
-name: Playwright Tests
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    environment: Development
-    env:
-      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
-      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
-      USER_CREDENTIALS: ${{ vars.USER_CREDENTIALS }}
-      UI_BASE_URL: ${{ vars.UI_BASE_URL }}
-      ENV: dev
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies, playwright and run tests
-      run: | 
-        cd Playwright
-        npm ci
-        npx playwright install --with-deps
-        npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+ # Having the free tier of tunnelling providers Zrok/Ngrok means an interstitial warning page is shown to the client when first visiting the proxied frontend. This is causing the Auth0 login flow to fail due to invalid state and I haven't found an effective workaround. This means I'm not able to run these Playwright tests in a Github Actions workflow using proxy tunnel to my localhost. So this feature will need to wait for a dedicated staging/test environment */  
+
+
+# name: Playwright Tests
+# on:
+#   push:
+#     branches: [ main, master ]
+#   pull_request:
+#     branches: [ main, master ]
+# jobs:
+#   test:
+#     timeout-minutes: 60
+#     runs-on: ubuntu-latest
+#     environment: Development
+#     env:
+#       AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+#       AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+#       USER_CREDENTIALS: ${{ vars.USER_CREDENTIALS }}
+#       UI_BASE_URL: ${{ vars.UI_BASE_URL }}
+#       ENV: dev
+#     steps:
+#     - uses: actions/checkout@v4
+#     - uses: actions/setup-node@v4
+#       with:
+#         node-version: lts/*
+#     - name: Install dependencies, playwright and run tests
+#       run: | 
+#         cd Playwright
+#         npm ci
+#         npx playwright install --with-deps
+#         npx playwright test
+#     - uses: actions/upload-artifact@v4
+#       if: ${{ !cancelled() }}
+#       with:
+#         name: playwright-report
+#         path: playwright-report/
+#         retention-days: 30

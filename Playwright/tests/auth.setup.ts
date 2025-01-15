@@ -22,14 +22,7 @@ setup('authenticate', async ({ page }) => {
       'Missing credentials for this user.'
     )
   }
-  /* Having the free tier of Zrok means an interstitial warning page is shown to the client when first visiting the proxied frontend. This header disables that warning, allowing the tests to run in Github Actions. */  
-  if (process.env.ENV === 'dev') {    
-    await page.setExtraHTTPHeaders({ 'skip_zrok_interstitial': 'true' }); 
-    await page.goto('');
-    await page.setExtraHTTPHeaders({});
-  } else {
-    await page.goto('');
-  }
+  await page.goto('');
   await page.getByText('Log In').click();
   await page.getByLabel('Email address').fill(auth0_username);
   await page.getByLabel('Password').fill(auth0_password);

@@ -13,15 +13,11 @@ test.describe('Exercise', () => {
         await expect(page.getByText('No exercises found')).toBeVisible();
     });
     
-    test('should add an exercise', async ({ page }) => {
-        addExercise(page);
-        await expect(page.getByText(EXERCISE)).toBeVisible(); 
-    });
-
-    test('should delete an exercise', async ({ page }) => {
+    test('should add an exercise and delete an exercise', async ({ page }) => {
         await addExercise(page);
+        await expect(page.getByText(EXERCISE)).toBeVisible();
         await deleteExercise(page);
-        await expect(page.getByText(EXERCISE)).not.toBeVisible();
+        await expect(page.getByText(EXERCISE)).not.toBeVisible(); 
     });
 });
 
