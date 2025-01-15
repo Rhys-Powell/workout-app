@@ -50,10 +50,6 @@ export default defineConfig({
     baseURL: getBaseURL(),
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    /* Having the free tier of Zrok means an interstitial warning page is shown to the client when first visiting my proxied frontend. This header disables that warning, allowing the tests to run in Github Actions. */  
-    extraHTTPHeaders: {
-      'skip_zrok_interstitial': 'true'
-    },
   },
 
   /* Configure projects for major browsers */

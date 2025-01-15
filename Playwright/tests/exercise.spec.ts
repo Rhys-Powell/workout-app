@@ -3,7 +3,6 @@ import { expect, Page, test } from '@playwright/test';
 const EXERCISE = 'Running';
 
 test.beforeEach(async ({ page }) => {
-    
     await page.goto('/profile');
     const currentUserId = await page.evaluate(() => localStorage['currentUserId']);
     await page.goto(`/users/${currentUserId}/exercises`);
@@ -20,8 +19,8 @@ test.describe('Exercise', () => {
     });
 
     test('should delete an exercise', async ({ page }) => {
-        addExercise(page);
-        deleteExercise(page);
+        await addExercise(page);
+        await deleteExercise(page);
         await expect(page.getByText(EXERCISE)).not.toBeVisible();
     });
 });
@@ -33,6 +32,5 @@ async function addExercise(page: Page) {
 }
 
 async function deleteExercise(page: Page) {
-    await page.getByText(EXERCISE).click();
-    await page.getByRole('button', { name: /delete/i }).click();
+    await page.locator('div:has-text("' + EXERCISE + '") > button').click();
 }
