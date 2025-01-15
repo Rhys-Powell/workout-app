@@ -22,8 +22,8 @@ jobs:
       with:
         node-version: lts/*
     - name: Install dependencies, playwright and run tests
-      working-directory: /Playwright  
       run: | 
+        cd Playwright
         npm ci
         npx playwright install --with-deps
         npx playwright test
