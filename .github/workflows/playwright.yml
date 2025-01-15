@@ -22,7 +22,7 @@ jobs:
       with:
         node-version: lts/*
     - name: Install dependencies, playwright and run tests
-      working-directory: ./workout-app/Playwright  
+      working-directory: /Playwright  
       run: | 
         npm ci
         npx playwright install --with-deps
