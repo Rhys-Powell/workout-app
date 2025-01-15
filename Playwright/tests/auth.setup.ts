@@ -23,7 +23,7 @@ setup('authenticate', async ({ page }) => {
     )
   }
   /* Having the free tier of Zrok means an interstitial warning page is shown to the client when first visiting the proxied frontend. This header disables that warning, allowing the tests to run in Github Actions. */  
-  if (process.env.ENV !== 'dev') {    
+  if (process.env.ENV === 'dev') {    
     await page.setExtraHTTPHeaders({ 'skip_zrok_interstitial': 'true' }); 
     await page.goto('');
     await page.setExtraHTTPHeaders({});
