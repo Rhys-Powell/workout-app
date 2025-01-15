@@ -8,6 +8,14 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    environment: Development
+    env:
+      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      API_TESTER_ADMIN1_USERNAME: ${{ vars.API_TESTER_ADMIN1_USERNAME }}
+      API_TESTER_ADMIN1_PASSWORD: ${{ secrets.API_TESTER_ADMIN1_PASSWORD }}
+      UI_BASE_URL: ${{ vars.UI_BASE_URL }}
+      ENV: dev
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4

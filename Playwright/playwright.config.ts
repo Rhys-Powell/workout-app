@@ -11,8 +11,23 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const isDev = process.env.ENV === 'dev';
-const baseURL = isDev ? 'http://localhost:5173' : 'https://workout-app-rwp.netlify.app/';
+
+const env = process.env.ENV;
+let baseURL: string;
+
+switch (env) {
+  case 'local':
+    baseURL = 'http://localhost:5173';
+    break;
+  case 'dev':
+    if (process.env.UI_BASE_URL) baseURL = process.env.UI_BASE_URL;
+    break;
+  case 'prod':
+    baseURL = 'https://workout-app-rwp.netlify.app/';
+    break;
+  default:
+    baseURL = 'http://localhost:5173';
+}
 
 export default defineConfig({
   testDir: './tests',
@@ -33,6 +48,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    /* Having the free tier of Zrok means an interstitial warning page is shown to the client when first visiting my proxied frontend. This header disables that warning, allowing the tests to run in Github Actions. */  
+    extraHTTPHeaders: {
+      'skip_zrok_interstitial': 'true'
+    },
   },
 
   /* Configure projects for major browsers */
