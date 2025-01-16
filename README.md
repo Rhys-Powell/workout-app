@@ -14,6 +14,7 @@ It features:
 - Postman API functional tests collection automatically runs using Newman CLI via a Github Actions workflow with a push to main branch. This obtains an access token, then runs requests to test each endpoint (happy path), including checking the data object (e.g. user, exercise etc) returned in the response body has the correct properties.
 
 The app is already deployed to https://workout-app-rwp.netlify.app and can be interacted with there. If you don't want to register with your real email, feel free to use a fake one as email verification is not required to log in.
+I've also created a UX walkthrough video of the app. It's about 17 mins long: https://vimeo.com/1047357237/9bb7b31056
 
 Link to my Postman collection of API functional tests: https://www.postman.com/speeding-shadow-539881/workout-app-api-testing/collection/yjjlcfy/workout-app-functional-api-tests
 
