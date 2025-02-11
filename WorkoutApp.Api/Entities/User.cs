@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WorkoutApp.Api.Entities;
 public class User
 {
-    public int Id { get; set; }
+    public virtual int Id { get; set; }
 
     public required string Name { get; set; }
 
